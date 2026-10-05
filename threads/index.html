@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threadly — Modern Social Community</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            appBg: '#101010',
+            cardBg: '#1E1E1E',
+            cardHover: '#252525',
+            accentBlue: '#0095F6',
+            accentBlueHover: '#0081d6',
+            accentBlueTint: 'rgba(0, 149, 246, 0.12)',
+            textPrimary: '#F3F5F7',
+            textSecondary: '#8E8E93',
+            textTertiary: '#636366',
+            borderSubtle: '#262626',
+            borderHover: '#383838',
+            destructive: '#EF4444'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          borderRadius: {
+            'card': '20px',
+            'card-lg': '24px',
+            'pill': '9999px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #101010;
+      color: #F3F5F7;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #101010;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #262626;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3a3a3a;
+    }
+    .tap-highlight-none {
+      -webkit-tap-highlight-color: transparent;
+    }
+    .like-active {
+      color: #EF4444 !important;
+    }
+    .like-active svg {
+      fill: #EF4444 !important;
+      stroke: #EF4444 !important;
+    }
+    .bookmark-active {
+      color: #0095F6 !important;
+    }
+    .bookmark-active svg {
+      fill: #0095F6 !important;
+      stroke: #0095F6 !important;
+    }
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+    }
+    .glass-nav {
+      background: rgba(16, 16, 16, 0.88);
+      backdrop-filter: blur(12px);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.18s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toast-anim {
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translate(-50%, 20px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+  </style>
+</head>
+<body class="bg-appBg text-textPrimary min-h-screen flex flex-col selection:bg-accentBlue selection:text-white pb-20 md:pb-6">
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toast-container" class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300"></div>
+
+  <!-- ==================== MAIN APPLICATION CONTAINER ==================== -->
+  <div class="max-w-[1240px] mx-auto w-full flex min-h-screen px-0 sm:px-4 lg:px-6">
+
+    <!-- ==================== DESKTOP LEFT SIDEBAR ==================== -->
+    <aside class="hidden md:flex flex-col justify-between w-64 lg:w-72 shrink-0 h-screen sticky top-0 p-4 lg:p-6 border-r border-borderSubtle">
+      <div class="flex flex-col gap-6">
+        <!-- Brand Logo Header -->
+        <div class="flex items-center gap-3 px-3 py-2 cursor-pointer select-none" onclick="switchTab('feed')">
+          <div class="w-10 h-10 rounded-xl bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue shadow-inner">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+              <path d="M8.5 8.5v.01"></path>
+              <path d="M12 12v.01"></path>
+            </svg>
+          </div>
+          <span class="text-2xl font-extrabold tracking-tight text-textPrimary">Threadly</span>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex flex-col gap-1.5" id="desktop-nav">
+          <button onclick="switchTab('feed')" data-tab="feed" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-card text-base font-semibold transition-all text-textPrimary bg-cardBg border border-borderSubtle text-accentBlue">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span>Home</span>
+          </button>
+          
+          <button onclick="switchTab('explore')" data-tab="explore" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-card text-base font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-cardBg/60">
+            <i data-lucide="compass" class="w-5 h-5"></i>
+            <span>Explore</span>
+          </button>
+          
+          <button onclick="switchTab('activity')" data-tab="activity" class="nav-btn w-full flex items-center justify-between px-4 py-3 rounded-card text-base font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-cardBg/60">
+            <div class="flex items-center gap-4">
+              <div class="relative">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <span id="desktop-unread-badge" class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-accentBlue rounded-full ring-2 ring-appBg"></span>
+              </div>
+              <span>Activity</span>
+            </div>
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-accentBlue/20 text-accentBlue">3</span>
+          </button>
+          
+          <button onclick="switchTab('profile')" data-tab="profile" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-card text-base font-medium transition-all text-textSecondary hover:text-textPrimary hover:bg-cardBg/60">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span>Profile</span>
+          </button>
+        </nav>
+
+        <!-- Primary Action Button -->
+        <button onclick="openCreatePostModal()" class="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-pill bg-accentBlue hover:bg-accentBlueHover text-white font-bold text-base shadow-lg shadow-accentBlue/20 transition-all active:scale-[0.98]">
+          <i data-lucide="plus" class="w-5 h-5"></i>
+          <span>Create post</span>
+        </button>
+      </div>
+
+      <!-- Account Mini Card -->
+      <div class="relative">
+        <div class="flex items-center justify-between p-3 rounded-card bg-cardBg border border-borderSubtle hover:border-borderHover cursor-pointer transition-all" onclick="toggleAccountMenu(event)">
+          <div class="flex items-center gap-3 min-w-0">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="User Avatar" class="w-10 h-10 rounded-full object-cover border border-borderSubtle shrink-0">
+            <div class="min-w-0 text-left">
+              <p class="text-sm font-bold text-textPrimary truncate">Maya Lin</p>
+              <p class="text-xs text-textSecondary truncate">@mayadesign</p>
+            </div>
+          </div>
+          <button class="p-1.5 text-textSecondary hover:text-textPrimary rounded-full" aria-label="Account options">
+            <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Account Dropdown Menu -->
+        <div id="account-dropdown" class="hidden absolute bottom-full left-0 right-0 mb-2 p-1.5 rounded-card bg-cardBg border border-borderSubtle shadow-2xl z-40">
+          <button onclick="switchTab('profile'); closeAllDropdowns();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-textPrimary hover:bg-cardHover transition-colors">
+            <i data-lucide="user" class="w-4 h-4 text-accentBlue"></i>
+            <span>View Profile</span>
+          </button>
+          <button onclick="openEditProfileModal(); closeAllDropdowns();" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-textPrimary hover:bg-cardHover transition-colors">
+            <i data-lucide="settings" class="w-4 h-4 text-textSecondary"></i>
+            <span>Edit Profile & Settings</span>
+          </button>
+          <div class="my-1 border-t border-borderSubtle"></div>
+          <button onclick="showToast('Switched to dark theme'); closeAllDropdowns();" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-textPrimary hover:bg-cardHover transition-colors">
+            <div class="flex items-center gap-3">
+              <i data-lucide="moon" class="w-4 h-4 text-accentBlue"></i>
+              <span>Theme: Dark</span>
+            </div>
+            <span class="text-xs text-accentBlue font-semibold">Active</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== CENTER CONTENT AREA ==================== -->
+    <main class="flex-1 min-w-0 flex flex-col min-h-screen border-r border-borderSubtle">
+
+      <!-- MOBILE TOP HEADER -->
+      <header class="md:hidden glass-nav sticky top-0 z-30 flex items-center justify-between px-4 py-3.5 border-b border-borderSubtle">
+        <div class="flex items-center gap-2.5" onclick="switchTab('feed')">
+          <div class="w-8 h-8 rounded-lg bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"></path>
+              <path d="M8.5 8.5v.01"></path>
+              <path d="M12 12v.01"></path>
+            </svg>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-textPrimary">Threadly</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="switchTab('activity')" class="p-2 text-textSecondary hover:text-textPrimary relative rounded-full hover:bg-cardBg" aria-label="Activity">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span id="mobile-unread-badge" class="absolute top-1.5 right-1.5 w-2 h-2 bg-accentBlue rounded-full"></span>
+          </button>
+          <button onclick="switchTab('profile')" class="p-1 rounded-full" aria-label="Profile">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="Maya Lin" class="w-7 h-7 rounded-full object-cover border border-accentBlue/50">
+          </button>
+        </div>
+      </header>
+
+      <!-- ==================== TAB 1: HOME / FEED ==================== -->
+      <section id="tab-feed" class="tab-content active flex-1">
+        <!-- Sticky Feed Header & Switcher -->
+        <div class="glass-nav sticky top-0 md:top-0 z-20 px-4 md:px-6 pt-3.5 pb-2.5 border-b border-borderSubtle">
+          <div class="flex items-center justify-between mb-3">
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight text-textPrimary">Home</h1>
+            <div class="flex items-center gap-1.5">
+              <button onclick="toggleFeedFilterState(this)" class="px-3 py-1 text-xs font-semibold rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary flex items-center gap-1.5 transition-colors">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-accentBlue"></i>
+                <span id="feed-filter-label">Algorithmic</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Feed Switcher Pills -->
+          <div class="flex border-b border-borderSubtle -mb-2.5">
+            <button onclick="selectFeedSubTab('for-you')" id="subtab-for-you" class="flex-1 pb-2.5 text-center text-sm font-bold text-accentBlue border-b-2 border-accentBlue transition-colors">
+              For you
+            </button>
+            <button onclick="selectFeedSubTab('following')" id="subtab-following" class="flex-1 pb-2.5 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary border-b-2 border-transparent transition-colors">
+              Following
+            </button>
+          </div>
+        </div>
+
+        <div class="p-4 md:p-6 space-y-5">
+          <!-- Top Post Composer Card -->
+          <div class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle shadow-sm transition-all focus-within:border-accentBlue/40">
+            <div class="flex gap-3.5">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="User avatar" class="w-10 h-10 rounded-full object-cover border border-borderSubtle shrink-0">
+              <div class="flex-1 min-w-0">
+                <textarea id="quick-composer-text" rows="2" placeholder="What’s on your mind, Maya?" class="w-full bg-transparent text-textPrimary placeholder:text-textTertiary resize-none text-base outline-none focus:ring-0 leading-relaxed"></textarea>
+                
+                <!-- Expanded Media preview placeholder (hidden by default) -->
+                <div id="quick-media-preview" class="hidden relative mt-2 rounded-card overflow-hidden border border-borderSubtle bg-appBg/50 p-2">
+                  <div class="flex items-center justify-between text-xs text-accentBlue font-medium">
+                    <span class="flex items-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> preview-draft.jpg ready</span>
+                    <button onclick="clearComposerMedia()" class="text-textSecondary hover:text-destructive"><i data-lucide="x" class="w-4 h-4"></i></button>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-3 mt-1 border-t border-borderSubtle/60">
+                  <div class="flex items-center gap-1">
+                    <button onclick="triggerAttachImage()" class="p-2 rounded-full text-textSecondary hover:text-accentBlue hover:bg-accentBlueTint transition-colors" title="Attach Image">
+                      <i data-lucide="image" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="showToast('Video picker opened')" class="p-2 rounded-full text-textSecondary hover:text-accentBlue hover:bg-accentBlueTint transition-colors" title="Attach Video">
+                      <i data-lucide="video" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="showToast('GIF selector available')" class="p-2 rounded-full text-textSecondary hover:text-accentBlue hover:bg-accentBlueTint transition-colors" title="Add GIF">
+                      <i data-lucide="file-video" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="openPollCreator()" class="p-2 rounded-full text-textSecondary hover:text-accentBlue hover:bg-accentBlueTint transition-colors" title="Create Poll">
+                      <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="showToast('Emoji picker opened')" class="p-2 rounded-full text-textSecondary hover:text-accentBlue hover:bg-accentBlueTint transition-colors" title="Add Emoji">
+                      <i data-lucide="smile" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+
+                  <button onclick="handleQuickPost()" class="px-5 py-2 rounded-pill bg-accentBlue hover:bg-accentBlueHover text-white text-sm font-bold shadow-md shadow-accentBlue/20 transition-all disabled:opacity-50 disabled:pointer-events-none">
+                    Post
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FEED STREAM -->
+          <div id="feed-container" class="space-y-4">
+
+            <!-- Post 1: Image + Text Post -->
+            <article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="1">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-400 p-0.5 shrink-0">
+                    <div class="w-full h-full rounded-full bg-cardBg flex items-center justify-center font-bold text-accentBlue text-sm">
+                      AR
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-bold text-textPrimary hover:underline cursor-pointer">Aarav Ray</span>
+                      <svg class="w-4 h-4 text-accentBlue fill-accentBlue shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15-5-5 1.41-1.41L11 13.17l7.59-7.59L20 7l-9 10z"/></svg>
+                      <span class="text-xs text-textSecondary">@aarav_ui</span>
+                      <span class="text-xs text-textTertiary">·</span>
+                      <span class="text-xs text-textSecondary">2h</span>
+                    </div>
+                    <span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Design systems</span>
+                  </div>
+                </div>
+
+                <!-- More options menu trigger -->
+                <div class="relative">
+                  <button onclick="togglePostMenu(event, 'post-menu-1')" class="p-2 text-textSecondary hover:text-textPrimary rounded-full hover:bg-cardHover transition-colors" aria-label="More options">
+                    <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                  </button>
+                  <div id="post-menu-1" class="hidden absolute right-0 top-full mt-1 w-44 rounded-card bg-cardBg border border-borderSubtle shadow-2xl p-1 z-30">
+                    <button onclick="copyPostLink(1)" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-textPrimary hover:bg-cardHover rounded-lg">
+                      <i data-lucide="link" class="w-4 h-4 text-accentBlue"></i> Copy link
+                    </button>
+                    <button onclick="showToast('Post muted for 30 days')" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-textPrimary hover:bg-cardHover rounded-lg">
+                      <i data-lucide="volume-x" class="w-4 h-4 text-textSecondary"></i> Mute @aarav_ui
+                    </button>
+                    <button onclick="showToast('Report submitted for review')" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-destructive hover:bg-cardHover rounded-lg">
+                      <i data-lucide="flag" class="w-4 h-4"></i> Report post
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Post Content Body -->
+              <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">
+                Just completed testing our new 8px spatial grid token hierarchy in dark interfaces. Contrast ratios on <span class="text-accentBlue font-medium">#101010</span> with elevated <span class="text-accentBlue font-medium">#1E1E1E</span> surfaces are remarkably gentle on the eyes during prolonged creative work. Here's a glimpse of the canvas layout tokens!
+              </p>
+
+              <!-- Media Placeholder: Landscape design card -->
+              <div class="mt-3.5 relative rounded-card overflow-hidden border border-borderSubtle bg-gradient-to-br from-[#1E1E1E] to-[#141414] aspect-[16/9] flex flex-col justify-end p-4 group cursor-pointer" onclick="showToast('Image expanded in lightbox')">
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#0095f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="relative z-10 flex items-center justify-between">
+                  <div class="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-pill border border-white/10">
+                    <i data-lucide="layers" class="w-3.5 h-3.5 text-accentBlue"></i>
+                    <span class="text-xs font-medium text-textPrimary">tokens-spec-v2.fig</span>
+                  </div>
+                  <span class="text-xs text-textSecondary bg-black/60 px-2.5 py-1 rounded-pill">PNG · 1080p</span>
+                </div>
+              </div>
+
+              <!-- Engagement Action Bar -->
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+                <button onclick="toggleLike(this, 128)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors group">
+                  <i data-lucide="heart" class="w-4 h-4 transition-transform group-active:scale-125"></i>
+                  <span class="like-count font-semibold">128</span>
+                </button>
+
+                <button onclick="openReplyComposer('Aarav Ray')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  <span class="font-semibold">34</span>
+                </button>
+
+                <div class="relative">
+                  <button onclick="toggleRepostMenu(event, 'repost-1')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors">
+                    <i data-lucide="repeat" class="w-4 h-4"></i>
+                    <span class="font-semibold">19</span>
+                  </button>
+                  <div id="repost-1" class="hidden absolute left-0 bottom-full mb-1 w-36 rounded-card bg-cardBg border border-borderSubtle shadow-xl p-1 z-30">
+                    <button onclick="showToast('Reposted to your followers')" class="w-full text-left px-3 py-1.5 text-xs text-textPrimary hover:bg-cardHover rounded-lg">Repost</button>
+                    <button onclick="openCreatePostModal('Quoting Aarav Ray: tokens-spec-v2.fig')" class="w-full text-left px-3 py-1.5 text-xs text-textPrimary hover:bg-cardHover rounded-lg">Quote post</button>
+                  </div>
+                </div>
+
+                <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="bookmark" class="w-4 h-4"></i>
+                </button>
+
+                <button onclick="openShareMenu(event, 'share-1')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="share-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Quick inline replies preview -->
+              <div class="mt-3 pt-3 border-t border-borderSubtle/50 flex items-center justify-between text-xs text-textTertiary">
+                <div class="flex items-center gap-2">
+                  <div class="flex -space-x-1.5 overflow-hidden">
+                    <div class="w-5 h-5 rounded-full bg-accentBlue text-[9px] flex items-center justify-center text-white font-bold">K</div>
+                    <div class="w-5 h-5 rounded-full bg-purple-500 text-[9px] flex items-center justify-center text-white font-bold">S</div>
+                  </div>
+                  <span>Karan and Sarah replied</span>
+                </div>
+                <button onclick="openReplyComposer('Aarav Ray')" class="text-accentBlue hover:underline font-semibold">View all 34 replies</button>
+              </div>
+            </article>
+
+            <!-- Post 2: Interactive Poll Post -->
+            <article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-500 to-amber-400 p-0.5 shrink-0">
+                    <div class="w-full h-full rounded-full bg-cardBg flex items-center justify-center font-bold text-amber-300 text-sm">
+                      SL
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-bold text-textPrimary hover:underline cursor-pointer">Sara Leclair</span>
+                      <span class="text-xs text-textSecondary">@saraux</span>
+                      <span class="text-xs text-textTertiary">·</span>
+                      <span class="text-xs text-textSecondary">5h</span>
+                    </div>
+                    <span class="text-xs text-accentBlue">Product Strategy</span>
+                  </div>
+                </div>
+                <button class="p-2 text-textSecondary hover:text-textPrimary rounded-full hover:bg-cardHover"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+              </div>
+
+              <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">
+                Quick poll for product designers: What is your primary navigation preference on mobile social web apps?
+              </p>
+
+              <!-- Poll Component Container -->
+              <div class="mt-3.5 space-y-2.5" id="poll-container-1">
+                <button onclick="votePoll(this, 'poll-container-1', 64)" class="w-full relative overflow-hidden rounded-card border border-borderSubtle bg-appBg/50 p-3 text-left transition-all hover:border-accentBlue group">
+                  <div class="poll-bar absolute inset-y-0 left-0 bg-accentBlue/20 transition-all duration-500 w-0 group-hover:bg-accentBlue/30"></div>
+                  <div class="relative z-10 flex items-center justify-between text-sm font-semibold">
+                    <span class="text-textPrimary">Bottom persistent tab bar</span>
+                    <span class="poll-pct text-accentBlue">64%</span>
+                  </div>
+                </button>
+
+                <button onclick="votePoll(this, 'poll-container-1', 28)" class="w-full relative overflow-hidden rounded-card border border-borderSubtle bg-appBg/50 p-3 text-left transition-all hover:border-accentBlue group">
+                  <div class="poll-bar absolute inset-y-0 left-0 bg-accentBlue/20 transition-all duration-500 w-0 group-hover:bg-accentBlue/30"></div>
+                  <div class="relative z-10 flex items-center justify-between text-sm font-semibold">
+                    <span class="text-textPrimary">Top header with drawer</span>
+                    <span class="poll-pct text-textSecondary">28%</span>
+                  </div>
+                </button>
+
+                <button onclick="votePoll(this, 'poll-container-1', 8)" class="w-full relative overflow-hidden rounded-card border border-borderSubtle bg-appBg/50 p-3 text-left transition-all hover:border-accentBlue group">
+                  <div class="poll-bar absolute inset-y-0 left-0 bg-accentBlue/20 transition-all duration-500 w-0 group-hover:bg-accentBlue/30"></div>
+                  <div class="relative z-10 flex items-center justify-between text-sm font-semibold">
+                    <span class="text-textPrimary">Floating action radial menu</span>
+                    <span class="poll-pct text-textSecondary">8%</span>
+                  </div>
+                </button>
+                <div class="text-[11px] text-textTertiary flex items-center justify-between pt-1">
+                  <span>842 votes · 18 hours left</span>
+                  <span class="text-accentBlue font-medium">Click to cast vote</span>
+                </div>
+              </div>
+
+              <!-- Engagement row -->
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+                <button onclick="toggleLike(this, 94)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="heart" class="w-4 h-4"></i>
+                  <span class="like-count font-semibold">94</span>
+                </button>
+                <button onclick="openReplyComposer('Sara Leclair')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  <span class="font-semibold">61</span>
+                </button>
+                <button onclick="showToast('Reposted poll')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors">
+                  <i data-lucide="repeat" class="w-4 h-4"></i>
+                  <span class="font-semibold">12</span>
+                </button>
+                <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="bookmark" class="w-4 h-4"></i>
+                </button>
+                <button onclick="showToast('Poll link copied to clipboard')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="share-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </article>
+
+            <!-- Post 3: Two-Image Visual Gallery & Video Card -->
+            <article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-300 p-0.5 shrink-0">
+                    <div class="w-full h-full rounded-full bg-cardBg flex items-center justify-center font-bold text-teal-400 text-sm">
+                      EN
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-bold text-textPrimary hover:underline cursor-pointer">Ethan Navarro</span>
+                      <svg class="w-4 h-4 text-accentBlue fill-accentBlue shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15-5-5 1.41-1.41L11 13.17l7.59-7.59L20 7l-9 10z"/></svg>
+                      <span class="text-xs text-textSecondary">@ethann</span>
+                    </div>
+                    <span class="text-xs text-textTertiary">8h ago</span>
+                  </div>
+                </div>
+                <button class="p-2 text-textSecondary hover:text-textPrimary rounded-full"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+              </div>
+
+              <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">
+                Weekend architecture stroll. Capturing Brutalist angles against soft evening shadows in Chennai. Minimal lines never fail to inspire UI layout grids.
+              </p>
+
+              <!-- 2-Image Gallery with play overlay on second -->
+              <div class="mt-3.5 grid grid-cols-2 gap-2 rounded-card overflow-hidden border border-borderSubtle">
+                <div class="relative aspect-square bg-[#171717] flex items-center justify-center overflow-hidden cursor-pointer group" onclick="showToast('Viewing photo 1/2')">
+                  <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-transparent"></div>
+                  <div class="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center text-textSecondary">
+                    <i data-lucide="camera" class="w-7 h-7 text-accentBlue"></i>
+                  </div>
+                  <span class="absolute bottom-2 left-2 text-[10px] font-semibold bg-black/70 px-2 py-0.5 rounded-full text-textPrimary">RAW · 35mm</span>
+                </div>
+
+                <div class="relative aspect-square bg-[#151515] flex items-center justify-center overflow-hidden cursor-pointer group" onclick="showToast('Playing ambient video clip')">
+                  <div class="absolute inset-0 bg-gradient-to-tl from-accentBlue/20 to-transparent"></div>
+                  <!-- Video Play Button Overlay -->
+                  <div class="w-12 h-12 rounded-full bg-accentBlue/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <i data-lucide="play" class="w-6 h-6 fill-white ml-0.5"></i>
+                  </div>
+                  <span class="absolute bottom-2 right-2 text-[10px] font-semibold bg-black/70 px-2 py-0.5 rounded-full text-white">0:24 · 4K</span>
+                </div>
+              </div>
+
+              <!-- Engagement row -->
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+                <button onclick="toggleLike(this, 312)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="heart" class="w-4 h-4"></i>
+                  <span class="like-count font-semibold">312</span>
+                </button>
+                <button onclick="openReplyComposer('Ethan Navarro')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  <span class="font-semibold">48</span>
+                </button>
+                <button onclick="showToast('Reposted architecture collection')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors">
+                  <i data-lucide="repeat" class="w-4 h-4"></i>
+                  <span class="font-semibold">53</span>
+                </button>
+                <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="bookmark" class="w-4 h-4"></i>
+                </button>
+                <button onclick="showToast('Gallery link copied to clipboard')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="share-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </article>
+
+            <!-- Post 4: Quote Post -->
+            <article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="Maya Lin" class="w-10 h-10 rounded-full object-cover border border-accentBlue/40 shrink-0">
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-bold text-textPrimary hover:underline cursor-pointer">Maya Lin</span>
+                      <svg class="w-4 h-4 text-accentBlue fill-accentBlue shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15-5-5 1.41-1.41L11 13.17l7.59-7.59L20 7l-9 10z"/></svg>
+                      <span class="text-xs text-textSecondary">@mayadesign</span>
+                    </div>
+                    <span class="text-xs text-textTertiary">14h ago</span>
+                  </div>
+                </div>
+                <button class="p-2 text-textSecondary hover:text-textPrimary rounded-full"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+              </div>
+
+              <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">
+                Couldn't agree more with this perspective. High density data needs disciplined whitespace rhythm, otherwise every feature competes for priority.
+              </p>
+
+              <!-- Quoted Inner Card -->
+              <div class="mt-3 rounded-card bg-appBg/70 p-3.5 border border-borderSubtle hover:border-accentBlue/30 transition-colors cursor-pointer" onclick="showToast('Navigating to original thread')">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <div class="w-5 h-5 rounded-full bg-violet-600 text-white text-[10px] font-bold flex items-center justify-center">D</div>
+                  <span class="text-xs font-bold text-textPrimary">Dan Abramov</span>
+                  <span class="text-xs text-textSecondary">@dan_abramov</span>
+                </div>
+                <p class="text-xs text-textSecondary leading-relaxed">
+                  "The best interfaces don't make you think about the software; they let you think through the problem you're actually trying to solve."
+                </p>
+              </div>
+
+              <!-- Engagement row -->
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+                <button onclick="toggleLike(this, 401)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="heart" class="w-4 h-4"></i>
+                  <span class="like-count font-semibold">401</span>
+                </button>
+                <button onclick="openReplyComposer('Maya Lin')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                  <span class="font-semibold">82</span>
+                </button>
+                <button onclick="showToast('Quoted thread shared')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors">
+                  <i data-lucide="repeat" class="w-4 h-4"></i>
+                  <span class="font-semibold">39</span>
+                </button>
+                <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="bookmark" class="w-4 h-4"></i>
+                </button>
+                <button onclick="showToast('Link copied')" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors">
+                  <i data-lucide="share-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </article>
+
+
+
+<!-- Added media post 101 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="101">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">Prabhas brings his signature screen presence to the Mumbai film scene in this festival moment.</p>
+  <div class="mt-3"><img src="media/Prabhas_at_MAMI_18th_Mumbai_film_festival.jpg" alt="Prabhas brings his signature screen presence to the Mumbai film scene in this festival moment." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#Prabhas #IndianCinema #Tollywood #FilmFestival #Entertainment</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(101)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 102 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="102">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">A proud view of the Indian tricolour flying above Vidhana Soudha in Bengaluru.</p>
+  <div class="mt-3"><img src="media/closeup-of-indian-flag-waving-on-the-dome-of-vidhana-soudha-at-bangaluru-india-TDATKJ.jpg" alt="A proud view of the Indian tricolour flying above Vidhana Soudha in Bengaluru." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#India #Bengaluru #VidhanaSoudha #IndianFlag #Heritage</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(102)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 103 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="103">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">A vibrant sunset view at Ramoji Film City, where cinema, architecture, and travel come together.</p>
+  <div class="mt-3"><img src="media/New-Project-84.webp" alt="A vibrant sunset view at Ramoji Film City, where cinema, architecture, and travel come together." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#RamojiFilmCity #Hyderabad #TravelIndia #Cinema #Sunset</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(103)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 104 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="104">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">National Voters’ Day is a reminder that every informed vote helps shape the future of a democracy.</p>
+  <div class="mt-3"><img src="media/images.jpg" alt="National Voters’ Day is a reminder that every informed vote helps shape the future of a democracy." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#NationalVotersDay #Democracy #Voting #CivicAwareness #India</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(104)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 105 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="105">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">A powerful crowd scene that captures the energy and scale of public life in India.</p>
+  <div class="mt-3"><img src="media/images (1).jpg" alt="A powerful crowd scene that captures the energy and scale of public life in India." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#India #PublicLife #Community #CurrentAffairs #People</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(105)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 106 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="106">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">A lively classroom filled with students learning together and building the foundations for tomorrow.</p>
+  <div class="mt-3"><img src="media/classroom-st-georges-school-in-rajasthan-jaisalmer-rajasthan-india-2N57HE2.jpg" alt="A lively classroom filled with students learning together and building the foundations for tomorrow." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#Education #SchoolLife #Students #Learning #Rajasthan</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(106)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 107 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="107">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">Students gathered together outside the classroom, sharing a moment of school life and community.</p>
+  <div class="mt-3"><img src="media/325428-2022-08-01-080645.webp" alt="Students gathered together outside the classroom, sharing a moment of school life and community." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#Students #SchoolLife #Education #Youth #Community</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(107)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 108 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="108">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">A look inside India’s Parliament, a central space for debate, representation, and public policy.</p>
+  <div class="mt-3"><img src="media/images (2).jpg" alt="A look inside India’s Parliament, a central space for debate, representation, and public policy." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#IndianParliament #Democracy #Politics #PublicPolicy #NewDelhi</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(108)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 109 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="109">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">Teachers and students working side by side show how curiosity and guidance turn lessons into progress.</p>
+  <div class="mt-3"><img src="media/istockphoto-1376131442-612x612.jpg" alt="Teachers and students working side by side show how curiosity and guidance turn lessons into progress." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#Teachers #Students #Education #Classroom #Learning</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(109)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 110 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="110">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">School friends celebrating a joyful moment together—proof that learning also happens through friendship and play.</p>
+  <div class="mt-3"><img src="media/school-children-dressed-uniform-have-fun-play-schoolyard_8353-6640.avif" alt="School friends celebrating a joyful moment together—proof that learning also happens through friendship and play." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#SchoolChildren #Childhood #Education #Friendship #SchoolLife</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(110)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 111 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="111">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">Students connecting around campus life, teamwork, and the everyday experiences that make education memorable.</p>
+  <div class="mt-3"><img src="media/gettyimages-2189800037-612x612.jpg" alt="Students connecting around campus life, teamwork, and the everyday experiences that make education memorable." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#CollegeLife #Students #Education #CampusLife #Youth</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(111)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 112 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="112">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">The Parliament building stands as one of India’s most recognizable symbols of democratic institutions.</p>
+  <div class="mt-3"><img src="media/Indian-Parliament.jpg" alt="The Parliament building stands as one of India’s most recognizable symbols of democratic institutions." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#IndianParliament #NewDelhi #Architecture #Democracy #India</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(112)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 113 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="113">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">A quiet work moment: focus, reflection, and a little space to think can make a busy day more productive.</p>
+  <div class="mt-3"><img src="media/images (3).jpg" alt="A quiet work moment: focus, reflection, and a little space to think can make a busy day more productive." loading="lazy" class="w-full rounded-card border border-borderSubtle object-contain max-h-[680px] bg-appBg"></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#Productivity #WorkLife #Focus #Career #Mindset</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(113)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 114 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="114">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">An aerial campus view showing the scale, pathways, and green spaces of a modern university.</p>
+  <div class="mt-3"><video class="w-full rounded-card border border-borderSubtle bg-black max-h-[620px] object-contain" controls preload="metadata" playsinline><source src="media/13638410-uhd_2560_1440_60fps.mp4" type="video/mp4">Your browser does not support video playback.</video></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#University #CampusLife #AerialVideo #Education #Architecture</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(114)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+
+<!-- Added media post 115 -->
+<article class="bg-cardBg rounded-card-lg p-4 md:p-5 border border-borderSubtle hover:border-borderHover transition-all" data-post-id="115">
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-accentBlue/10 border border-accentBlue/30 flex items-center justify-center text-accentBlue font-bold text-sm shrink-0">TC</div>
+      <div><div class="flex items-center gap-1.5 flex-wrap"><span class="font-bold text-textPrimary">Threadly Community</span><span class="text-xs text-textSecondary">@threadly</span><span class="text-xs text-textTertiary">·</span><span class="text-xs text-textSecondary">Today</span></div><span class="inline-block text-[11px] font-semibold text-accentBlue bg-accentBlueTint px-2 py-0.5 rounded-pill mt-0.5">Community media</span></div>
+    </div>
+    <button class="p-2 text-textSecondary rounded-full" aria-label="More options"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+  </div>
+  <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">A playful reaction clip for those moments when the perfect meme says more than words ever could.</p>
+  <div class="mt-3"><video class="w-full rounded-card border border-borderSubtle bg-black max-h-[620px] object-contain" controls preload="metadata" playsinline><source src="media/Allu_Arjun_Meme_Downlaod.mp4" type="video/mp4">Your browser does not support video playback.</video></div>
+  <p class="mt-3 text-sm leading-relaxed text-accentBlue">#AlluArjun #Meme #IndianCinema #Reaction #Funny</p>
+  <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+    <button onclick="toggleLike(this, 0)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="heart" class="w-4 h-4"></i><span class="like-count font-semibold">0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="message-circle" class="w-4 h-4"></i><span>0</span></button>
+    <button class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"><i data-lucide="repeat" class="w-4 h-4"></i><span>0</span></button>
+    <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+    <button onclick="copyPostLink(115)" class="flex items-center gap-2 py-1 px-2.5 rounded-pill hover:bg-accentBlueTint hover:text-accentBlue transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i></button>
+  </div>
+</article>
+          </div>
+
+          <!-- Loading Skeleton / Infinite Scroll Trigger -->
+          <div id="feed-loader" class="py-6 flex flex-col items-center justify-center gap-3">
+            <button onclick="loadMoreFeedPosts(this)" class="px-5 py-2.5 rounded-pill bg-cardBg border border-borderSubtle hover:border-accentBlue text-textPrimary text-xs font-bold transition-all flex items-center gap-2">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-accentBlue"></i>
+              <span>Load older conversations</span>
+            </button>
+            <span class="text-[11px] text-textTertiary">End of fresh feed · All caught up</span>
+          </div>
+
+          <!-- Feed Empty State (Toggleable for testing) -->
+          <div id="feed-empty-state" class="hidden bg-cardBg rounded-card-lg p-8 text-center border border-dashed border-borderSubtle">
+            <div class="w-14 h-14 mx-auto rounded-full bg-accentBlue/10 flex items-center justify-center text-accentBlue mb-3">
+              <i data-lucide="feather" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-base font-bold text-textPrimary">Your feed is quiet for now</h3>
+            <p class="text-xs text-textSecondary max-w-xs mx-auto mt-1 mb-4">Follow topics or creative contributors in Explore to populate your daily social timeline.</p>
+            <button onclick="switchTab('explore')" class="px-4 py-2 rounded-pill bg-accentBlue text-white text-xs font-bold">Discover people & topics</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 2: EXPLORE / DISCOVERY ==================== -->
+      <section id="tab-explore" class="tab-content flex-1">
+        <div class="glass-nav sticky top-0 md:top-0 z-20 px-4 md:px-6 py-3.5 border-b border-borderSubtle">
+          <h1 class="text-xl md:text-2xl font-bold tracking-tight text-textPrimary mb-3">Explore</h1>
+
+          <!-- Search Input Field -->
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-textTertiary"></i>
+            <input type="text" id="explore-search-input" onkeyup="handleExploreSearch(this.value)" placeholder="Search Threadly for topics, creators, or keywords..." class="w-full bg-cardBg border border-borderSubtle focus:border-accentBlue rounded-pill pl-10 pr-10 py-2.5 text-sm text-textPrimary placeholder:text-textTertiary outline-none transition-all focus:ring-1 focus:ring-accentBlue">
+            <button onclick="clearExploreSearch()" id="explore-search-clear" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-textTertiary hover:text-textPrimary">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Filter Chips -->
+          <div class="flex items-center gap-2 overflow-x-auto pt-3 pb-1 no-scrollbar text-xs font-semibold">
+            <button onclick="selectExploreFilter(this, 'all')" class="explore-filter-btn px-4 py-1.5 rounded-pill bg-accentBlue text-white shrink-0 transition-colors">Top</button>
+            <button onclick="selectExploreFilter(this, 'latest')" class="explore-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Latest</button>
+            <button onclick="selectExploreFilter(this, 'people')" class="explore-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">People</button>
+            <button onclick="selectExploreFilter(this, 'posts')" class="explore-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Posts</button>
+            <button onclick="selectExploreFilter(this, 'media')" class="explore-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Media</button>
+          </div>
+        </div>
+
+        <div class="p-4 md:p-6 space-y-6">
+
+          <!-- Section: Trending Topics -->
+          <div class="bg-cardBg rounded-card-lg p-5 border border-borderSubtle">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-bold text-textPrimary flex items-center gap-2">
+                <i data-lucide="trending-up" class="w-4 h-4 text-accentBlue"></i>
+                Trending for you
+              </h2>
+              <button onclick="showToast('Refreshing trends')" class="text-xs text-accentBlue hover:underline font-semibold">Refresh</button>
+            </div>
+
+            <div class="divide-y divide-borderSubtle/60">
+              <div class="py-3 flex items-center justify-between cursor-pointer group" onclick="searchTopic('Design systems')">
+                <div>
+                  <span class="text-[11px] text-textTertiary font-medium">Technology · Trending</span>
+                  <p class="text-sm font-bold text-textPrimary group-hover:text-accentBlue transition-colors">Design systems</p>
+                  <span class="text-xs text-textSecondary">14.2K threads today</span>
+                </div>
+                <button class="p-1.5 text-textSecondary hover:text-textPrimary rounded-full"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+              </div>
+
+              <div class="py-3 flex items-center justify-between cursor-pointer group" onclick="searchTopic('Tamil Nadu food')">
+                <div>
+                  <span class="text-[11px] text-textTertiary font-medium">Culture & Cuisine · Viral</span>
+                  <p class="text-sm font-bold text-textPrimary group-hover:text-accentBlue transition-colors">Tamil Nadu food</p>
+                  <span class="text-xs text-textSecondary">8.6K threads today</span>
+                </div>
+                <button class="p-1.5 text-textSecondary hover:text-textPrimary rounded-full"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+              </div>
+
+              <div class="py-3 flex items-center justify-between cursor-pointer group" onclick="searchTopic('Web development')">
+                <div>
+                  <span class="text-[11px] text-textTertiary font-medium">Software Engineering</span>
+                  <p class="text-sm font-bold text-textPrimary group-hover:text-accentBlue transition-colors">Web development</p>
+                  <span class="text-xs text-textSecondary">29.1K threads today</span>
+                </div>
+                <button class="p-1.5 text-textSecondary hover:text-textPrimary rounded-full"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+              </div>
+
+              <div class="py-3 flex items-center justify-between cursor-pointer group" onclick="searchTopic('Weekend photography')">
+                <div>
+                  <span class="text-[11px] text-textTertiary font-medium">Visual Arts · Community</span>
+                  <p class="text-sm font-bold text-textPrimary group-hover:text-accentBlue transition-colors">Weekend photography</p>
+                  <span class="text-xs text-textSecondary">5.4K threads today</span>
+                </div>
+                <button class="p-1.5 text-textSecondary hover:text-textPrimary rounded-full"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Suggested People to Follow -->
+          <div class="bg-cardBg rounded-card-lg p-5 border border-borderSubtle">
+            <h2 class="text-base font-bold text-textPrimary mb-4 flex items-center gap-2">
+              <i data-lucide="user-plus" class="w-4 h-4 text-accentBlue"></i>
+              Suggested creators
+            </h2>
+
+            <div class="space-y-4">
+              <!-- Creator 1 -->
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white text-xs shrink-0">
+                    VK
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-bold text-textPrimary truncate hover:underline cursor-pointer">Vikram K.</p>
+                    <p class="text-xs text-textSecondary truncate">@vikram_arch</p>
+                    <p class="text-xs text-textTertiary truncate mt-0.5">Architect & Spatial UI Explorer</p>
+                  </div>
+                </div>
+                <button onclick="toggleFollowUser(this)" class="follow-toggle-btn shrink-0 px-4 py-1.5 rounded-pill bg-textPrimary text-appBg hover:bg-white text-xs font-bold transition-all">
+                  Follow
+                </button>
+              </div>
+
+              <!-- Creator 2 -->
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-red-500 flex items-center justify-center font-bold text-white text-xs shrink-0">
+                    NL
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-bold text-textPrimary truncate hover:underline cursor-pointer">Nisha Leonard</p>
+                    <p class="text-xs text-textSecondary truncate">@nishawrites</p>
+                    <p class="text-xs text-textTertiary truncate mt-0.5">Essayist on tech philosophy & mindfulness</p>
+                  </div>
+                </div>
+                <button onclick="toggleFollowUser(this)" class="follow-toggle-btn shrink-0 px-4 py-1.5 rounded-pill bg-textPrimary text-appBg hover:bg-white text-xs font-bold transition-all">
+                  Follow
+                </button>
+              </div>
+
+              <!-- Creator 3 -->
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-emerald-600 flex items-center justify-center font-bold text-white text-xs shrink-0">
+                    TP
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-bold text-textPrimary truncate hover:underline cursor-pointer">Tariq Patel</p>
+                    <p class="text-xs text-textSecondary truncate">@tariqdev</p>
+                    <p class="text-xs text-textTertiary truncate mt-0.5">Building open web standards & microfrontends</p>
+                  </div>
+                </div>
+                <button onclick="toggleFollowUser(this)" class="follow-toggle-btn shrink-0 px-4 py-1.5 rounded-pill bg-textPrimary text-appBg hover:bg-white text-xs font-bold transition-all">
+                  Follow
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Discovery Media Grid -->
+          <div class="bg-cardBg rounded-card-lg p-5 border border-borderSubtle">
+            <h2 class="text-base font-bold text-textPrimary mb-3 flex items-center gap-2">
+              <i data-lucide="grid" class="w-4 h-4 text-accentBlue"></i>
+              Visual Discovery
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5">
+              <div class="relative aspect-square rounded-card overflow-hidden bg-[#181818] border border-borderSubtle cursor-pointer group" onclick="showToast('Opened Photography category')">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                <div class="absolute inset-0 flex items-center justify-center opacity-30 text-accentBlue">
+                  <i data-lucide="image" class="w-8 h-8"></i>
+                </div>
+                <span class="absolute bottom-2.5 left-2.5 z-20 text-xs font-bold text-textPrimary group-hover:text-accentBlue transition-colors">Photography</span>
+              </div>
+
+              <div class="relative aspect-square rounded-card overflow-hidden bg-[#181818] border border-borderSubtle cursor-pointer group" onclick="showToast('Opened Design category')">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                <div class="absolute inset-0 flex items-center justify-center opacity-30 text-accentBlue">
+                  <i data-lucide="palette" class="w-8 h-8"></i>
+                </div>
+                <span class="absolute bottom-2.5 left-2.5 z-20 text-xs font-bold text-textPrimary group-hover:text-accentBlue transition-colors">Design Systems</span>
+              </div>
+
+              <div class="relative aspect-square rounded-card overflow-hidden bg-[#181818] border border-borderSubtle cursor-pointer group" onclick="showToast('Opened Technology category')">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                <div class="absolute inset-0 flex items-center justify-center opacity-30 text-accentBlue">
+                  <i data-lucide="cpu" class="w-8 h-8"></i>
+                </div>
+                <span class="absolute bottom-2.5 left-2.5 z-20 text-xs font-bold text-textPrimary group-hover:text-accentBlue transition-colors">Technology</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: POST ACTIVITY ==================== -->
+      <section id="tab-activity" class="tab-content flex-1">
+        <div class="glass-nav sticky top-0 md:top-0 z-20 px-4 md:px-6 py-3.5 border-b border-borderSubtle">
+          <div class="flex items-center justify-between mb-3">
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight text-textPrimary">Post Activity</h1>
+            <button onclick="markAllNotificationsAsRead()" class="text-xs text-accentBlue hover:underline font-semibold flex items-center gap-1.5">
+              <i data-lucide="check-check" class="w-4 h-4"></i>
+              <span>Mark all as read</span>
+            </button>
+          </div>
+
+          <!-- Activity Filter Tabs -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs font-semibold">
+            <button onclick="filterActivity(this, 'all')" class="activity-filter-btn px-4 py-1.5 rounded-pill bg-accentBlue text-white shrink-0 transition-colors">All</button>
+            <button onclick="filterActivity(this, 'replies')" class="activity-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Replies</button>
+            <button onclick="filterActivity(this, 'likes')" class="activity-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Likes</button>
+            <button onclick="filterActivity(this, 'reposts')" class="activity-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Reposts</button>
+            <button onclick="filterActivity(this, 'mentions')" class="activity-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Mentions</button>
+            <button onclick="filterActivity(this, 'follows')" class="activity-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors">Follows</button>
+          </div>
+        </div>
+
+        <div class="p-4 md:p-6 space-y-3" id="activity-feed-list">
+
+          <!-- Activity 1: Like Notification (Unread) -->
+          <div class="activity-item unread p-4 rounded-card bg-cardBg border border-accentBlue/30 hover:border-accentBlue/60 transition-all flex items-start gap-3.5 cursor-pointer relative" data-type="likes" onclick="showToast('Navigating to liked post')">
+            <div class="w-2.5 h-2.5 rounded-full bg-accentBlue absolute top-4 right-4 unread-dot"></div>
+            <div class="relative shrink-0">
+              <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white text-xs">
+                DK
+              </div>
+              <div class="w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center absolute -bottom-1 -right-1 shadow-sm">
+                <i data-lucide="heart" class="w-3 h-3 fill-white"></i>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0 pr-4">
+              <p class="text-sm text-textPrimary leading-snug">
+                <span class="font-bold">David Kim</span> and <span class="font-bold">4 others</span> liked your thread: <span class="text-textSecondary">"8px spatial grid token hierarchy..."</span>
+              </p>
+              <span class="text-[11px] text-textTertiary mt-1 inline-block">10m ago</span>
+            </div>
+          </div>
+
+          <!-- Activity 2: Reply Notification (Unread) -->
+          <div class="activity-item unread p-4 rounded-card bg-cardBg border border-accentBlue/30 hover:border-accentBlue/60 transition-all flex items-start gap-3.5 cursor-pointer relative" data-type="replies" onclick="openReplyComposer('Elena Rostova')">
+            <div class="w-2.5 h-2.5 rounded-full bg-accentBlue absolute top-4 right-4 unread-dot"></div>
+            <div class="relative shrink-0">
+              <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white text-xs">
+                ER
+              </div>
+              <div class="w-5 h-5 rounded-full bg-accentBlue text-white flex items-center justify-center absolute -bottom-1 -right-1 shadow-sm">
+                <i data-lucide="message-circle" class="w-3 h-3 fill-white"></i>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0 pr-4">
+              <p class="text-sm text-textPrimary leading-snug">
+                <span class="font-bold">Elena Rostova</span> replied to you:
+              </p>
+              <p class="text-xs text-textSecondary bg-appBg/60 p-2.5 rounded-lg mt-1.5 border border-borderSubtle">
+                "Are you maintaining the same saturation weight for input borders in high contrast mode?"
+              </p>
+              <span class="text-[11px] text-textTertiary mt-1 inline-block">42m ago</span>
+            </div>
+          </div>
+
+          <!-- Activity 3: Follow Notification -->
+          <div class="activity-item p-4 rounded-card bg-cardBg border border-borderSubtle hover:border-borderHover transition-all flex items-center justify-between gap-3" data-type="follows">
+            <div class="flex items-center gap-3.5 min-w-0">
+              <div class="relative shrink-0">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white text-xs">
+                  JM
+                </div>
+                <div class="w-5 h-5 rounded-full bg-textPrimary text-appBg flex items-center justify-center absolute -bottom-1 -right-1 shadow-sm">
+                  <i data-lucide="user-plus" class="w-3 h-3"></i>
+                </div>
+              </div>
+              <div class="min-w-0">
+                <p class="text-sm text-textPrimary">
+                  <span class="font-bold">Julian Moore</span> <span class="text-textSecondary">(@jmoore) followed you.</span>
+                </p>
+                <span class="text-[11px] text-textTertiary mt-0.5 inline-block">3h ago</span>
+              </div>
+            </div>
+            <button onclick="toggleFollowUser(this)" class="follow-toggle-btn shrink-0 px-4 py-1.5 rounded-pill bg-accentBlue hover:bg-accentBlueHover text-white text-xs font-bold transition-all">
+              Follow back
+            </button>
+          </div>
+
+          <!-- Activity 4: Repost Notification -->
+          <div class="activity-item p-4 rounded-card bg-cardBg border border-borderSubtle hover:border-borderHover transition-all flex items-start gap-3.5 cursor-pointer" data-type="reposts" onclick="showToast('Opened reposted thread')">
+            <div class="relative shrink-0">
+              <div class="w-10 h-10 rounded-full bg-amber-600 flex items-center justify-center font-bold text-white text-xs">
+                MC
+              </div>
+              <div class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center absolute -bottom-1 -right-1 shadow-sm">
+                <i data-lucide="repeat" class="w-3 h-3"></i>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-textPrimary leading-snug">
+                <span class="font-bold">Marcus Chen</span> reposted your thread to 18.4K followers.
+              </p>
+              <span class="text-[11px] text-textTertiary mt-1 inline-block">1d ago</span>
+            </div>
+          </div>
+
+          <!-- Empty Activity State (hidden by default) -->
+          <div id="activity-empty-state" class="hidden bg-cardBg rounded-card-lg p-8 text-center border border-dashed border-borderSubtle">
+            <div class="w-12 h-12 mx-auto rounded-full bg-accentBlue/10 flex items-center justify-center text-accentBlue mb-2">
+              <i data-lucide="bell-off" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-sm font-bold text-textPrimary">No new activity yet</h3>
+            <p class="text-xs text-textSecondary max-w-xs mx-auto mt-1">When someone interacts with your posts or profile, notifications will show here.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== TAB 4: PROFILE ==================== -->
+      <section id="tab-profile" class="tab-content flex-1">
+        <!-- Profile Banner Cover Image -->
+        <div class="relative h-44 sm:h-52 bg-gradient-to-r from-[#1E1E1E] via-[#242424] to-[#121212] border-b border-borderSubtle">
+          <div class="absolute inset-0 opacity-25 bg-[radial-gradient(#0095f6_1.5px,transparent_1.5px)] [background-size:24px_24px]"></div>
+          
+          <div class="absolute top-4 right-4 flex items-center gap-2">
+            <button onclick="showToast('Cover photo options')" class="p-2 rounded-full bg-black/60 backdrop-blur-md text-textPrimary hover:bg-black/90 transition-colors">
+              <i data-lucide="camera" class="w-4 h-4"></i>
+            </button>
+            <button onclick="showToast('Profile share sheet opened')" class="p-2 rounded-full bg-black/60 backdrop-blur-md text-textPrimary hover:bg-black/90 transition-colors">
+              <i data-lucide="share" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="px-4 md:px-6">
+          <!-- Profile Avatar & Action Row -->
+          <div class="flex items-end justify-between -mt-14 mb-4">
+            <div class="relative">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="Maya Lin" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-appBg border border-borderSubtle shadow-xl">
+              <span class="absolute bottom-1 right-1 w-5 h-5 bg-accentBlue rounded-full ring-2 ring-appBg flex items-center justify-center text-white text-[10px]" title="Online">✓</span>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+              <button onclick="openEditProfileModal()" class="px-5 py-2 rounded-pill bg-cardBg border border-borderSubtle hover:border-accentBlue text-textPrimary text-xs font-bold transition-all shadow-sm">
+                Edit profile
+              </button>
+              <button onclick="showToast('Profile settings')" class="p-2 rounded-full bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary">
+                <i data-lucide="sliders" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Profile Details Bio -->
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl sm:text-2xl font-extrabold text-textPrimary">Maya Lin</h1>
+              <svg class="w-5 h-5 text-accentBlue fill-accentBlue shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15-5-5 1.41-1.41L11 13.17l7.59-7.59L20 7l-9 10z"/></svg>
+            </div>
+            <p class="text-xs text-textSecondary font-medium">@mayadesign</p>
+
+            <p class="text-sm text-textPrimary mt-3 leading-relaxed max-w-xl">
+              Product Designer & Creative Technologist. Obsessed with clean spatial design, micro-interactions, and accessible dark user interfaces. Building calm tools for internet humans.
+            </p>
+
+            <!-- Metadata info items -->
+            <div class="flex flex-wrap items-center gap-y-2 gap-x-4 mt-3.5 text-xs text-textSecondary">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-accentBlue"></i>
+                <span>San Francisco, CA</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="link" class="w-3.5 h-3.5 text-accentBlue"></i>
+                <a href="#" onclick="event.preventDefault(); showToast('External link opened');" class="text-accentBlue hover:underline">mayadesign.studio</a>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-textTertiary"></i>
+                <span>Joined March 2024</span>
+              </div>
+            </div>
+
+            <!-- Followers / Following Counts -->
+            <div class="flex items-center gap-5 mt-4 pt-3 border-t border-borderSubtle text-xs">
+              <div class="cursor-pointer hover:underline" onclick="showToast('Followers list: 1,482 people')">
+                <span class="font-bold text-textPrimary text-sm">1,482</span> <span class="text-textSecondary">Followers</span>
+              </div>
+              <div class="cursor-pointer hover:underline" onclick="showToast('Following list: 341 people')">
+                <span class="font-bold text-textPrimary text-sm">341</span> <span class="text-textSecondary">Following</span>
+              </div>
+              <div class="text-textTertiary">·</div>
+              <div class="text-textTertiary">2.4K Threads posted</div>
+            </div>
+          </div>
+
+          <!-- Profile Navigation Tabs -->
+          <div class="flex border-b border-borderSubtle mt-5">
+            <button onclick="selectProfileSubTab('posts')" id="proftab-posts" class="flex-1 py-3 text-center text-xs sm:text-sm font-bold text-accentBlue border-b-2 border-accentBlue transition-colors">
+              Posts
+            </button>
+            <button onclick="selectProfileSubTab('replies')" id="proftab-replies" class="flex-1 py-3 text-center text-xs sm:text-sm font-semibold text-textSecondary hover:text-textPrimary border-b-2 border-transparent transition-colors">
+              Replies
+            </button>
+            <button onclick="selectProfileSubTab('media')" id="proftab-media" class="flex-1 py-3 text-center text-xs sm:text-sm font-semibold text-textSecondary hover:text-textPrimary border-b-2 border-transparent transition-colors">
+              Media
+            </button>
+            <button onclick="selectProfileSubTab('likes')" id="proftab-likes" class="flex-1 py-3 text-center text-xs sm:text-sm font-semibold text-textSecondary hover:text-textPrimary border-b-2 border-transparent transition-colors">
+              Likes
+            </button>
+          </div>
+
+          <!-- Profile SubTab Content: Posts -->
+          <div id="profile-subtab-posts" class="py-4 space-y-4">
+            <!-- Pinned Post Card -->
+            <div class="bg-cardBg rounded-card-lg p-4 sm:p-5 border border-borderSubtle">
+              <div class="flex items-center gap-2 text-xs font-semibold text-accentBlue mb-2">
+                <i data-lucide="pin" class="w-3.5 h-3.5 fill-accentBlue"></i>
+                <span>Pinned Thread</span>
+              </div>
+              <p class="text-sm leading-relaxed text-textPrimary">
+                Welcome to my corner of Threadly! I'll be sharing ongoing experiments on tactile UI design, design tokens, and frontend code architecture. Leave a reply anytime!
+              </p>
+              <div class="flex items-center gap-4 mt-3 text-xs text-textSecondary">
+                <span>1,204 Likes</span>
+                <span>·</span>
+                <span>218 Replies</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile SubTab Content: Replies (hidden) -->
+          <div id="profile-subtab-replies" class="hidden py-4 space-y-3">
+            <div class="bg-cardBg rounded-card p-4 border border-borderSubtle">
+              <span class="text-xs text-textTertiary">Replied to @aarav_ui:</span>
+              <p class="text-xs text-textPrimary mt-1">"The contrast on #1E1E1E with white glyphs is flawless."</p>
+            </div>
+          </div>
+
+          <!-- Profile SubTab Content: Media Grid (hidden) -->
+          <div id="profile-subtab-media" class="hidden py-4 grid grid-cols-3 gap-2">
+            <div class="aspect-square bg-cardBg rounded-lg border border-borderSubtle flex items-center justify-center text-accentBlue"><i data-lucide="image" class="w-6 h-6"></i></div>
+            <div class="aspect-square bg-cardBg rounded-lg border border-borderSubtle flex items-center justify-center text-accentBlue"><i data-lucide="play" class="w-6 h-6"></i></div>
+            <div class="aspect-square bg-cardBg rounded-lg border border-borderSubtle flex items-center justify-center text-accentBlue"><i data-lucide="image" class="w-6 h-6"></i></div>
+          </div>
+
+          <!-- Profile SubTab Content: Likes (hidden) -->
+          <div id="profile-subtab-likes" class="hidden py-4 space-y-3">
+            <div class="bg-cardBg rounded-card p-4 border border-borderSubtle text-xs text-textSecondary">
+              Liked posts by Dan Abramov and Sara Leclair.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==================== DESKTOP RIGHT SIDEBAR ==================== -->
+    <aside class="hidden lg:flex flex-col gap-6 w-80 shrink-0 h-screen sticky top-0 p-6 overflow-y-auto">
+      
+      <!-- Search Widget -->
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-textTertiary"></i>
+        <input type="text" onfocus="switchTab('explore')" placeholder="Search Threadly..." class="w-full bg-cardBg border border-borderSubtle focus:border-accentBlue rounded-pill pl-10 pr-4 py-2.5 text-xs text-textPrimary placeholder:text-textTertiary outline-none transition-all">
+      </div>
+
+      <!-- Trending Card -->
+      <div class="bg-cardBg rounded-card-lg p-5 border border-borderSubtle">
+        <h3 class="text-sm font-bold text-textPrimary mb-3 flex items-center justify-between">
+          <span>Trending Conversations</span>
+          <i data-lucide="flame" class="w-4 h-4 text-accentBlue"></i>
+        </h3>
+        <div class="space-y-3">
+          <div class="cursor-pointer group" onclick="searchTopic('Design systems')">
+            <p class="text-xs text-textTertiary">Design · Trending</p>
+            <p class="text-sm font-semibold text-textPrimary group-hover:text-accentBlue">#DesignSystems</p>
+            <p class="text-[11px] text-textSecondary">14.2K posts</p>
+          </div>
+          <div class="cursor-pointer group" onclick="searchTopic('Tamil Nadu food')">
+            <p class="text-xs text-textTertiary">Food & Culture</p>
+            <p class="text-sm font-semibold text-textPrimary group-hover:text-accentBlue">#TamilNaduFood</p>
+            <p class="text-[11px] text-textSecondary">8.6K posts</p>
+          </div>
+          <div class="cursor-pointer group" onclick="searchTopic('Weekend photography')">
+            <p class="text-xs text-textTertiary">Photography</p>
+            <p class="text-sm font-semibold text-textPrimary group-hover:text-accentBlue">#WeekendPhotography</p>
+            <p class="text-[11px] text-textSecondary">5.4K posts</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Who to Follow Card -->
+      <div class="bg-cardBg rounded-card-lg p-5 border border-borderSubtle">
+        <h3 class="text-sm font-bold text-textPrimary mb-3">Who to follow</h3>
+        <div class="space-y-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">VK</div>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-textPrimary truncate">Vikram K.</p>
+                <p class="text-[11px] text-textSecondary truncate">@vikram_arch</p>
+              </div>
+            </div>
+            <button onclick="toggleFollowUser(this)" class="px-3 py-1 rounded-pill bg-textPrimary hover:bg-white text-appBg text-xs font-bold shrink-0 transition-all">Follow</button>
+          </div>
+
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-full bg-amber-500 text-white font-bold text-xs flex items-center justify-center shrink-0">NL</div>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-textPrimary truncate">Nisha Leonard</p>
+                <p class="text-[11px] text-textSecondary truncate">@nishawrites</p>
+              </div>
+            </div>
+            <button onclick="toggleFollowUser(this)" class="px-3 py-1 rounded-pill bg-textPrimary hover:bg-white text-appBg text-xs font-bold shrink-0 transition-all">Follow</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Information & Footer -->
+      <div class="text-[11px] text-textTertiary leading-relaxed px-2 space-y-1">
+        <div class="flex flex-wrap gap-x-3 gap-y-1">
+          <a href="#" onclick="event.preventDefault(); showToast('Privacy Policy');" class="hover:underline">Privacy</a>
+          <a href="#" onclick="event.preventDefault(); showToast('Terms of Service');" class="hover:underline">Terms</a>
+          <a href="#" onclick="event.preventDefault(); showToast('Community Guidelines');" class="hover:underline">Guidelines</a>
+          <a href="#" onclick="event.preventDefault(); showToast('API Documentation');" class="hover:underline">Developers</a>
+        </div>
+        <p class="text-textTertiary/60 mt-2">© 2025 Threadly Inc. · Dark Mode</p>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ==================== MOBILE BOTTOM NAVIGATION BAR ==================== -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 glass-nav border-t border-borderSubtle z-30 px-3 py-2">
+    <div class="flex items-center justify-around max-w-md mx-auto">
+      <button onclick="switchTab('feed')" data-tab="feed" class="mobile-nav-btn p-2.5 rounded-full text-accentBlue transition-colors flex flex-col items-center gap-0.5" aria-label="Home Feed">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Feed</span>
+      </button>
+
+      <button onclick="switchTab('explore')" data-tab="explore" class="mobile-nav-btn p-2.5 rounded-full text-textSecondary transition-colors flex flex-col items-center gap-0.5" aria-label="Explore">
+        <i data-lucide="compass" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Explore</span>
+      </button>
+
+      <!-- Center Create Post Button -->
+      <button onclick="openCreatePostModal()" class="w-11 h-11 rounded-full bg-accentBlue text-white flex items-center justify-center shadow-lg shadow-accentBlue/30 -mt-3 border-2 border-appBg transition-transform active:scale-95" aria-label="Create Post">
+        <i data-lucide="plus" class="w-6 h-6"></i>
+      </button>
+
+      <button onclick="switchTab('activity')" data-tab="activity" class="mobile-nav-btn p-2.5 rounded-full text-textSecondary transition-colors flex flex-col items-center gap-0.5 relative" aria-label="Activity">
+        <i data-lucide="bell" class="w-5 h-5"></i>
+        <span id="mobile-bottom-unread-dot" class="absolute top-2 right-3 w-2 h-2 bg-accentBlue rounded-full"></span>
+        <span class="text-[10px] font-medium">Activity</span>
+      </button>
+
+      <button onclick="switchTab('profile')" data-tab="profile" class="mobile-nav-btn p-2.5 rounded-full text-textSecondary transition-colors flex flex-col items-center gap-0.5" aria-label="Profile">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span class="text-[10px] font-medium">Profile</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== MODAL 1: CREATE POST MODAL ==================== -->
+  <div id="modal-create-post" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-cardBg rounded-card-lg border border-borderSubtle w-full max-w-lg overflow-hidden shadow-2xl transition-all">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-5 py-4 border-b border-borderSubtle">
+        <h3 class="text-base font-bold text-textPrimary">New Thread</h3>
+        <button onclick="closeModal('modal-create-post')" class="p-1 rounded-full text-textSecondary hover:text-textPrimary hover:bg-cardHover">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5">
+        <div class="flex gap-3.5">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="Maya Lin" class="w-10 h-10 rounded-full object-cover border border-borderSubtle shrink-0">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="text-sm font-bold text-textPrimary">Maya Lin</span>
+              <span class="text-xs text-textSecondary">@mayadesign</span>
+            </div>
+
+            <!-- Audience Selector Pill -->
+            <button onclick="toggleAudience(this)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill bg-appBg border border-borderSubtle text-[11px] font-medium text-accentBlue mb-2">
+              <i data-lucide="globe" class="w-3 h-3"></i>
+              <span id="audience-label">Anyone can reply</span>
+              <i data-lucide="chevron-down" class="w-3 h-3"></i>
+            </button>
+
+            <textarea id="modal-composer-textarea" oninput="updateCharCount(this)" rows="4" placeholder="What’s happening? Share a design thought, question, or update..." class="w-full bg-transparent text-textPrimary placeholder:text-textTertiary resize-none text-base outline-none focus:ring-0 leading-relaxed"></textarea>
+          </div>
+        </div>
+
+        <!-- Attachment Tools & Counter -->
+        <div class="flex items-center justify-between pt-4 mt-2 border-t border-borderSubtle">
+          <div class="flex items-center gap-1 text-textSecondary">
+            <button onclick="showToast('Image attachment added')" class="p-2 rounded-full hover:text-accentBlue hover:bg-accentBlueTint"><i data-lucide="image" class="w-4 h-4"></i></button>
+            <button onclick="showToast('Video added')" class="p-2 rounded-full hover:text-accentBlue hover:bg-accentBlueTint"><i data-lucide="video" class="w-4 h-4"></i></button>
+            <button onclick="showToast('GIF added')" class="p-2 rounded-full hover:text-accentBlue hover:bg-accentBlueTint"><i data-lucide="file-video" class="w-4 h-4"></i></button>
+            <button onclick="showToast('Poll created in composer')" class="p-2 rounded-full hover:text-accentBlue hover:bg-accentBlueTint"><i data-lucide="bar-chart-2" class="w-4 h-4"></i></button>
+            <button onclick="showToast('Emoji tray')" class="p-2 rounded-full hover:text-accentBlue hover:bg-accentBlueTint"><i data-lucide="smile" class="w-4 h-4"></i></button>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span id="composer-char-count" class="text-xs text-textTertiary">0 / 280</span>
+            <button onclick="submitModalPost()" id="modal-post-btn" class="px-5 py-2 rounded-pill bg-accentBlue hover:bg-accentBlueHover text-white text-sm font-bold shadow-md shadow-accentBlue/20 transition-all disabled:opacity-50">
+              Post
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: EDIT PROFILE MODAL ==================== -->
+  <div id="modal-edit-profile" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-cardBg rounded-card-lg border border-borderSubtle w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-borderSubtle">
+        <h3 class="text-base font-bold text-textPrimary">Edit Profile</h3>
+        <button onclick="closeModal('modal-edit-profile')" class="p-1 rounded-full text-textSecondary hover:text-textPrimary">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+        <!-- Photo Upload Preview -->
+        <div class="flex items-center gap-4">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="Avatar" class="w-16 h-16 rounded-full object-cover border border-borderSubtle">
+          <div>
+            <button onclick="showToast('Select replacement image file')" class="px-3.5 py-1.5 rounded-pill bg-appBg border border-borderSubtle text-xs font-semibold text-textPrimary hover:border-accentBlue">
+              Change photo
+            </button>
+            <p class="text-[11px] text-textTertiary mt-1">Recommended: 400x400 JPG or PNG</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-textSecondary mb-1">Display Name</label>
+          <input type="text" id="edit-display-name" value="Maya Lin" class="w-full bg-appBg border border-borderSubtle focus:border-accentBlue rounded-xl px-3.5 py-2.5 text-sm text-textPrimary outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-textSecondary mb-1">Username</label>
+          <input type="text" id="edit-username" value="mayadesign" class="w-full bg-appBg border border-borderSubtle focus:border-accentBlue rounded-xl px-3.5 py-2.5 text-sm text-textPrimary outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-textSecondary mb-1">Bio</label>
+          <textarea id="edit-bio" rows="3" class="w-full bg-appBg border border-borderSubtle focus:border-accentBlue rounded-xl px-3.5 py-2.5 text-sm text-textPrimary outline-none resize-none">Product Designer & Creative Technologist. Obsessed with clean spatial design, micro-interactions, and accessible dark user interfaces.</textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-textSecondary mb-1">Location</label>
+            <input type="text" id="edit-location" value="San Francisco, CA" class="w-full bg-appBg border border-borderSubtle focus:border-accentBlue rounded-xl px-3.5 py-2.5 text-xs text-textPrimary outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-textSecondary mb-1">Website</label>
+            <input type="text" id="edit-website" value="mayadesign.studio" class="w-full bg-appBg border border-borderSubtle focus:border-accentBlue rounded-xl px-3.5 py-2.5 text-xs text-textPrimary outline-none">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-borderSubtle bg-appBg/40">
+        <button onclick="closeModal('modal-edit-profile')" class="px-4 py-2 rounded-pill text-xs font-bold text-textSecondary hover:text-textPrimary">Cancel</button>
+        <button onclick="saveProfileChanges()" class="px-5 py-2 rounded-pill bg-accentBlue hover:bg-accentBlueHover text-white text-xs font-bold shadow-md shadow-accentBlue/20">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT INTERACTIONS & APP STATE ==================== -->
+  <script>
+    // Initialize Lucide Icons
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+    });
+
+    // Navigation Switcher between all 4 tabs
+    function switchTab(tabId) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Show targeted tab
+      const targetTab = document.getElementById(`tab-${tabId}`);
+      if (targetTab) {
+        targetTab.classList.add('active');
+      }
+
+      // Update Desktop Sidebar styles
+      document.querySelectorAll('#desktop-nav .nav-btn').forEach(btn => {
+        const isSelected = btn.getAttribute('data-tab') === tabId;
+        if (isSelected) {
+          btn.classList.add('text-accentBlue', 'bg-cardBg', 'border-borderSubtle');
+          btn.classList.remove('text-textSecondary');
+        } else {
+          btn.classList.remove('text-accentBlue', 'bg-cardBg', 'border-borderSubtle');
+          btn.classList.add('text-textSecondary');
+        }
+      });
+
+      // Update Mobile Bottom Nav styles
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        const isSelected = btn.getAttribute('data-tab') === tabId;
+        if (isSelected) {
+          btn.classList.add('text-accentBlue');
+          btn.classList.remove('text-textSecondary');
+        } else {
+          btn.classList.remove('text-accentBlue');
+          btn.classList.add('text-textSecondary');
+        }
+      });
+
+      // Scroll smoothly to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Subtab filter for Home Feed ("For you" vs "Following")
+    function selectFeedSubTab(mode) {
+      const forYouBtn = document.getElementById('subtab-for-you');
+      const followingBtn = document.getElementById('subtab-following');
+      
+      if (mode === 'for-you') {
+        forYouBtn.className = 'flex-1 pb-2.5 text-center text-sm font-bold text-accentBlue border-b-2 border-accentBlue transition-colors';
+        followingBtn.className = 'flex-1 pb-2.5 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary border-b-2 border-transparent transition-colors';
+        showToast('Switched to For you feed');
+      } else {
+        followingBtn.className = 'flex-1 pb-2.5 text-center text-sm font-bold text-accentBlue border-b-2 border-accentBlue transition-colors';
+        forYouBtn.className = 'flex-1 pb-2.5 text-center text-sm font-semibold text-textSecondary hover:text-textPrimary border-b-2 border-transparent transition-colors';
+        showToast('Switched to Following feed');
+      }
+    }
+
+    // Subtab switcher for Profile (Posts, Replies, Media, Likes)
+    function selectProfileSubTab(sub) {
+      ['posts', 'replies', 'media', 'likes'].forEach(s => {
+        const btn = document.getElementById(`proftab-${s}`);
+        const content = document.getElementById(`profile-subtab-${s}`);
+        if (s === sub) {
+          if (btn) btn.className = 'flex-1 py-3 text-center text-xs sm:text-sm font-bold text-accentBlue border-b-2 border-accentBlue transition-colors';
+          if (content) content.classList.remove('hidden');
+        } else {
+          if (btn) btn.className = 'flex-1 py-3 text-center text-xs sm:text-sm font-semibold text-textSecondary hover:text-textPrimary border-b-2 border-transparent transition-colors';
+          if (content) content.classList.add('hidden');
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // Toggle Likes on Feed
+    function toggleLike(btn, initialCount) {
+      const isLiked = btn.classList.contains('like-active');
+      const countSpan = btn.querySelector('.like-count');
+      let count = parseInt(countSpan.innerText);
+
+      if (isLiked) {
+        btn.classList.remove('like-active');
+        countSpan.innerText = count - 1;
+        showToast('Like removed');
+      } else {
+        btn.classList.add('like-active');
+        countSpan.innerText = count + 1;
+        showToast('Post liked');
+      }
+      lucide.createIcons();
+    }
+
+    // Toggle Bookmark
+    function toggleBookmark(btn) {
+      const isBookmarked = btn.classList.contains('bookmark-active');
+      if (isBookmarked) {
+        btn.classList.remove('bookmark-active');
+        showToast('Removed from bookmarks');
+      } else {
+        btn.classList.add('bookmark-active');
+        showToast('Saved to bookmarks');
+      }
+      lucide.createIcons();
+    }
+
+    // Follow Toggle Action
+    function toggleFollowUser(btn) {
+      const isFollowing = btn.classList.contains('following-active');
+      if (isFollowing) {
+        btn.classList.remove('following-active');
+        btn.innerText = 'Follow';
+        btn.className = 'follow-toggle-btn shrink-0 px-4 py-1.5 rounded-pill bg-textPrimary text-appBg hover:bg-white text-xs font-bold transition-all';
+        showToast('Unfollowed creator');
+      } else {
+        btn.classList.add('following-active');
+        btn.innerText = 'Following';
+        btn.className = 'follow-toggle-btn shrink-0 px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-destructive hover:border-destructive text-xs font-bold transition-all';
+        showToast('You are now following this user');
+      }
+    }
+
+    // Interactive Poll Voting
+    function votePoll(btn, containerId, percent) {
+      const container = document.getElementById(containerId);
+      const buttons = container.querySelectorAll('button');
+      buttons.forEach(b => {
+        const bar = b.querySelector('.poll-bar');
+        if (b === btn) {
+          bar.style.width = percent + '%';
+          bar.classList.add('!bg-accentBlue/40');
+          b.classList.add('border-accentBlue');
+        } else {
+          bar.style.width = '20%';
+          b.classList.add('opacity-70');
+        }
+      });
+      showToast(`Vote recorded: ${percent}%`);
+    }
+
+    // Quick Composer in Feed
+    function handleQuickPost() {
+      const text = document.getElementById('quick-composer-text').value.trim();
+      if (!text) {
+        showToast('Please type a message first');
+        return;
+      }
+
+      // Prepend newly created post
+      const feedContainer = document.getElementById('feed-container');
+      const newPost = document.createElement('article');
+      newPost.className = 'bg-cardBg rounded-card-lg p-4 md:p-5 border border-accentBlue/40 shadow-lg animate-[fadeIn_0.2s_ease-out]';
+      newPost.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG0JkpPZ9G7vk2krFb5FaDvqldYGRynpVtmQZZLkGqXMOkT_xGFzMJHHZOCtfBgpIa483eXi3SJqnSlnSwTnwnQEqUZdUmgIoXsYgh9t4Ch0g9hCCnhHtfAgqhCJqggViCYbFYrcPsan-L_Lkg7qE_Y1YEhQdtyd8lOdj5NeZdh1ltdAr_Nl0W0HGhLEylxutM3XuyDdr0Nmks-Uy3dgm6IubE-7xJWqua3yuGwBxV7OgcyOYt_Y5NXQ" alt="Maya" class="w-10 h-10 rounded-full object-cover border border-accentBlue/60">
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-textPrimary">Maya Lin</span>
+                <span class="text-xs text-textSecondary">@mayadesign</span>
+                <span class="text-xs text-accentBlue">· Just now</span>
+              </div>
+            </div>
+          </div>
+          <button class="p-2 text-textSecondary"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+        </div>
+        <p class="mt-3 text-[15px] leading-relaxed text-textPrimary">${escapeHTML(text)}</p>
+        <div class="flex items-center justify-between mt-4 pt-3 border-t border-borderSubtle text-textSecondary text-xs">
+          <button onclick="toggleLike(this, 1)" class="flex items-center gap-2 py-1 px-2 rounded-pill hover:text-accentBlue"><i data-lucide="heart" class="w-4 h-4"></i> <span class="like-count">0</span></button>
+          <button class="flex items-center gap-2 py-1 px-2 rounded-pill hover:text-accentBlue"><i data-lucide="message-circle" class="w-4 h-4"></i> 0</button>
+          <button class="flex items-center gap-2 py-1 px-2 rounded-pill hover:text-emerald-400"><i data-lucide="repeat" class="w-4 h-4"></i> 0</button>
+          <button onclick="toggleBookmark(this)" class="flex items-center gap-2 py-1 px-2 rounded-pill"><i data-lucide="bookmark" class="w-4 h-4"></i></button>
+        </div>
+      `;
+      feedContainer.prepend(newPost);
+      document.getElementById('quick-composer-text').value = '';
+      clearComposerMedia();
+      showToast('Post published');
+      lucide.createIcons();
+    }
+
+    function triggerAttachImage() {
+      const preview = document.getElementById('quick-media-preview');
+      preview.classList.remove('hidden');
+      showToast('Attachment preview ready');
+    }
+
+    function clearComposerMedia() {
+      const preview = document.getElementById('quick-media-preview');
+      preview.classList.add('hidden');
+    }
+
+    // Modal Handlers
+    function openCreatePostModal(presetText = '') {
+      const modal = document.getElementById('modal-create-post');
+      const textarea = document.getElementById('modal-composer-textarea');
+      if (presetText) textarea.value = presetText;
+      modal.classList.remove('hidden');
+      textarea.focus();
+    }
+
+    function openEditProfileModal() {
+      document.getElementById('modal-edit-profile').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function updateCharCount(textarea) {
+      const count = textarea.value.length;
+      document.getElementById('composer-char-count').innerText = `${count} / 280`;
+    }
+
+    function submitModalPost() {
+      const text = document.getElementById('modal-composer-textarea').value.trim();
+      if (!text) {
+        showToast('Please type a message');
+        return;
+      }
+      closeModal('modal-create-post');
+      document.getElementById('modal-composer-textarea').value = '';
+      showToast('Post published');
+    }
+
+    function saveProfileChanges() {
+      closeModal('modal-edit-profile');
+      showToast('Profile updated');
+    }
+
+    // Dropdowns & More Menus
+    function togglePostMenu(event, menuId) {
+      event.stopPropagation();
+      const menu = document.getElementById(menuId);
+      const isHidden = menu.classList.contains('hidden');
+      closeAllDropdowns();
+      if (isHidden) menu.classList.remove('hidden');
+    }
+
+    function toggleAccountMenu(event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('account-dropdown');
+      dropdown.classList.toggle('hidden');
+    }
+
+    function closeAllDropdowns() {
+      document.querySelectorAll('#account-dropdown, [id^="post-menu-"], [id^="repost-"]').forEach(el => {
+        el.classList.add('hidden');
+      });
+    }
+
+    window.addEventListener('click', () => {
+      closeAllDropdowns();
+    });
+
+    // Notification Activity Controls
+    function markAllNotificationsAsRead() {
+      document.querySelectorAll('.activity-item.unread').forEach(item => {
+        item.classList.remove('unread', 'border-accentBlue/30');
+        item.classList.add('border-borderSubtle');
+        const dot = item.querySelector('.unread-dot');
+        if (dot) dot.remove();
+      });
+      // Clear badges
+      const deskBadge = document.getElementById('desktop-unread-badge');
+      if (deskBadge) deskBadge.remove();
+      const mobBadge = document.getElementById('mobile-unread-badge');
+      if (mobBadge) mobBadge.remove();
+      const bottomDot = document.getElementById('mobile-bottom-unread-dot');
+      if (bottomDot) bottomDot.remove();
+      showToast('All notifications marked as read');
+    }
+
+    function filterActivity(btn, type) {
+      document.querySelectorAll('.activity-filter-btn').forEach(b => {
+        b.className = 'activity-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors';
+      });
+      btn.className = 'activity-filter-btn px-4 py-1.5 rounded-pill bg-accentBlue text-white shrink-0 transition-colors';
+
+      const items = document.querySelectorAll('.activity-item');
+      items.forEach(it => {
+        if (type === 'all' || it.getAttribute('data-type') === type) {
+          it.style.display = 'flex';
+        } else {
+          it.style.display = 'none';
+        }
+      });
+    }
+
+    // Explore Filter & Search
+    function selectExploreFilter(btn, cat) {
+      document.querySelectorAll('.explore-filter-btn').forEach(b => {
+        b.className = 'explore-filter-btn px-4 py-1.5 rounded-pill bg-cardBg border border-borderSubtle text-textSecondary hover:text-textPrimary shrink-0 transition-colors';
+      });
+      btn.className = 'explore-filter-btn px-4 py-1.5 rounded-pill bg-accentBlue text-white shrink-0 transition-colors';
+      showToast(`Showing ${cat} results`);
+    }
+
+    function handleExploreSearch(val) {
+      const clearBtn = document.getElementById('explore-search-clear');
+      if (val.trim().length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+    }
+
+    function clearExploreSearch() {
+      const input = document.getElementById('explore-search-input');
+      input.value = '';
+      document.getElementById('explore-search-clear').classList.add('hidden');
+    }
+
+    function searchTopic(topic) {
+      switchTab('explore');
+      const input = document.getElementById('explore-search-input');
+      input.value = topic;
+      handleExploreSearch(topic);
+      showToast(`Showing results for "${topic}"`);
+    }
+
+    function loadMoreFeedPosts(btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-accentBlue"></i> <span>Loading posts...</span>`;
+      lucide.createIcons();
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> <span>Feed updated</span>`;
+        lucide.createIcons();
+        showToast('Loaded 5 new community threads');
+      }, 700);
+    }
+
+    function copyPostLink(id) {
+      showToast('Link copied to clipboard');
+    }
+
+    function openReplyComposer(name) {
+      openCreatePostModal(`Replying to @${name.toLowerCase().replace(/\s+/g, '')} `);
+    }
+
+    function toggleAudience(btn) {
+      const label = document.getElementById('audience-label');
+      if (label.innerText.includes('Anyone')) {
+        label.innerText = 'Profiles you follow';
+        showToast('Audience set to: Profiles you follow');
+      } else {
+        label.innerText = 'Anyone can reply';
+        showToast('Audience set to: Public / Anyone');
+      }
+    }
+
+    // Modern Toast Notification Utility
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast-anim pointer-events-auto flex items-center gap-2.5 px-4 py-2.5 rounded-pill bg-cardBg border border-borderSubtle shadow-2xl text-xs font-semibold text-textPrimary';
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-accentBlue"></span>
+        <span>${escapeHTML(msg)}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, 10px)';
+        toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 250);
+      }, 2600);
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+  </script>
+</body>
+</html>
