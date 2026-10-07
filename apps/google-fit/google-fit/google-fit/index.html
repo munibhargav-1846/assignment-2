@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Fit</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar"><span class="logo">Fit</span><span id="today-label"></span></header>
+
+  <main>
+    <!-- 1. HOME / DASHBOARD -->
+    <section id="home" class="tab-page active">
+      <h1>Good <span id="greet">day</span>, <span class="uname">Alex</span></h1>
+      <div class="rings">
+        <svg viewBox="0 0 120 120" aria-label="Progress rings">
+          <circle class="trk" cx="60" cy="60" r="52"/><circle id="ring-heart" class="ring blue" cx="60" cy="60" r="52"/>
+          <circle class="trk" cx="60" cy="60" r="38"/><circle id="ring-move" class="ring green" cx="60" cy="60" r="38"/>
+        </svg>
+        <div class="ring-legend">
+          <p><i class="dot blue"></i><b id="v-heart">0</b> / <span class="g-heart">30</span> Heart Points</p>
+          <p><i class="dot green"></i><b id="v-move">0</b> / <span class="g-move">60</span> Move Minutes</p>
+        </div>
+      </div>
+      <div class="stats">
+        <div><b id="v-steps">0</b><span>Steps</span></div>
+        <div><b id="v-cal">0</b><span>Calories</span></div>
+        <div><b id="v-km">0</b><span>Kilometres</span></div>
+      </div>
+      <h2>This week</h2>
+      <div id="week-chart" class="bars"></div>
+      <button class="primary" data-go="explore">Log an activity</button>
+    </section>
+
+    <!-- 2. EXPLORE / BROWSE -->
+    <section id="explore" class="tab-page">
+      <h1>Explore</h1>
+      <div class="chips" id="chips">
+        <button class="chip on" data-filter="all">All</button>
+        <button class="chip" data-filter="cardio">Cardio</button>
+        <button class="chip" data-filter="strength">Strength</button>
+        <button class="chip" data-filter="calm">Calm</button>
+      </div>
+      <ul id="activity-list" class="list"></ul>
+      <h2>Read</h2>
+      <ul class="list tips">
+        <li><b>What are Heart Points?</b><small>You earn 1 point per minute of moderate effort and 2 per minute of intense effort.</small></li>
+        <li><b>Why 150 minutes a week?</b><small>Health guidelines suggest 150 minutes of moderate activity each week.</small></li>
+      </ul>
+    </section>
+
+    <!-- 3. DETAILS / ACTIVITY -->
+    <section id="activity" class="tab-page">
+      <h1>Activity</h1>
+      <div class="progress-card">
+        <label>Steps <span id="p-steps-t"></span></label><div class="meter"><i id="p-steps"></i></div>
+        <label>Heart Points <span id="p-heart-t"></span></label><div class="meter"><i id="p-heart" class="blue"></i></div>
+        <label>Move Minutes <span id="p-move-t"></span></label><div class="meter"><i id="p-move" class="green"></i></div>
+      </div>
+      <h2>Journal</h2>
+      <ul id="journal" class="list"></ul>
+      <p id="journal-empty" class="empty">Nothing logged yet. Pick an activity in Explore to start.</p>
+      <button class="ghost" id="clear-journal">Clear journal</button>
+    </section>
+
+    <!-- 4. PROFILE / SETTINGS -->
+    <section id="profile" class="tab-page">
+      <h1>Profile</h1>
+      <div class="avatar" id="avatar">A</div>
+      <form id="profile-form" onsubmit="return false">
+        <label>Name <input id="f-name" type="text" maxlength="20"></label>
+        <label>Daily step goal <input id="f-steps" type="number" min="1000" step="500"></label>
+        <label>Heart Points goal <input id="f-heart" type="number" min="5"></label>
+        <label>Move Minutes goal <input id="f-move" type="number" min="10" step="5"></label>
+        <label class="row">Dark mode <input id="f-dark" type="checkbox"></label>
+        <button class="primary" id="save-profile">Save changes</button>
+      </form>
+      <button class="ghost danger" id="reset-all">Reset all data</button>
+    </section>
+  </main>
+
+  <nav class="app-tabs">
+    <button data-tab="home" class="on">Home</button>
+    <button data-tab="explore">Explore</button>
+    <button data-tab="activity">Activity</button>
+    <button data-tab="profile">Profile</button>
+  </nav>
+  <div id="toast" role="status"></div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

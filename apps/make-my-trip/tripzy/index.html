@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tripzy — Gen-Z Travel Booking</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-primary selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- 1. FLOATING TOP NAVIGATION (DESKTOP) -->
+  <!-- ========================================================================= -->
+  <header class="fixed top-4 left-0 right-0 z-50 px-4 md:px-8 max-w-7xl mx-auto pointer-events-none">
+    <div class="pointer-events-auto bg-white/90 backdrop-blur-md border border-brand-border/80 shadow-floating rounded-full px-5 py-3 flex items-center justify-between transition-all duration-300">
+      
+      <!-- Brand Logo -->
+      <a href="javascript:void(0)" onclick="switchView('home')" class="flex items-center group" aria-label="Tripzy home">
+        <img src="assets/tripzy-logo.png"
+             alt="Tripzy — Gen-Z Travel Club"
+             class="h-14 sm:h-16 w-auto object-contain group-hover:scale-[1.02] transition-transform"
+             title="Tripzy">
+      </a>
+
+      <!-- 4 Primary Navigation Links (Desktop) -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-full border border-slate-200" aria-label="Main Navigation">
+        <button id="nav-btn-home" onclick="switchView('home')" class="nav-tab px-4 py-2 rounded-full text-xs font-bold tracking-wide flex items-center gap-2 transition-all bg-brand-primary text-white shadow-sm">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>HOME / SEARCH</span>
+        </button>
+        <button id="nav-btn-explore" onclick="switchView('explore')" class="nav-tab px-4 py-2 rounded-full text-xs font-semibold tracking-wide flex items-center gap-2 text-brand-neutral hover:text-brand-primary transition-all">
+          <i data-lucide="compass" class="w-4 h-4"></i>
+          <span>EXPLORE TRIPS</span>
+        </button>
+        <button id="nav-btn-booking" onclick="switchView('booking')" class="nav-tab px-4 py-2 rounded-full text-xs font-semibold tracking-wide flex items-center gap-2 text-brand-neutral hover:text-brand-primary transition-all">
+          <i data-lucide="map" class="w-4 h-4"></i>
+          <span>BOOKING / DETAILS</span>
+        </button>
+        <button id="nav-btn-profile" onclick="switchView('profile')" class="nav-tab px-4 py-2 rounded-full text-xs font-semibold tracking-wide flex items-center gap-2 text-brand-neutral hover:text-brand-primary transition-all">
+          <i data-lucide="user-round" class="w-4 h-4"></i>
+          <span>PROFILE & TRIPS</span>
+        </button>
+      </nav>
+
+      <!-- Right Utility Actions -->
+      <div class="flex items-center gap-3">
+        <button onclick="switchView('explore')" class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-brand-primary bg-cyan-50 hover:bg-cyan-100 rounded-full border border-cyan-200 transition">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-brand-tertiary"></i>
+          <span>Special Offers</span>
+        </button>
+        <div onclick="switchView('profile')" class="w-9 h-9 rounded-full bg-slate-200 border-2 border-brand-primary overflow-hidden cursor-pointer flex items-center justify-center text-xs font-bold text-brand-neutral" title="User Profile">
+          <i data-lucide="user" class="w-5 h-5 text-brand-primary"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN ROUTE CONTAINER -->
+  <!-- ========================================================================= -->
+  <main class="flex-grow pt-24 pb-24 md:pb-16 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 1: HOME / SEARCH PAGE -->
+    <!-- ======================================================================= -->
+    <section id="view-home" class="page-view space-y-16">
+      
+      <!-- HERO SECTION -->
+      <div class="relative w-full rounded-[24px] overflow-hidden shadow-floating bg-slate-900 min-h-[520px] md:min-h-[580px] flex flex-col justify-between p-6 sm:p-10 md:p-14">
+        <!-- Hero Background Placeholder Graphic (16:7 simulation) -->
+        <div class="absolute inset-0 z-0">
+          <div class="w-full h-full img-placeholder border-0 rounded-none bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-950 opacity-90 flex flex-col items-center justify-center">
+            <i data-lucide="mountain-snow" class="w-16 h-16 text-cyan-400/40 mb-2"></i>
+            <span class="text-xs font-mono tracking-widest text-cyan-200/50 bg-slate-950/60 px-3 py-1 rounded-full border border-cyan-500/20">
+              [IMAGE_PLACEHOLDER_HOME_HERO] (Ratio 16:7 Immersive Travel Backdrop)
+            </span>
+          </div>
+          <!-- Dark & Gradient Overlays for perfect legibility -->
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/50 to-transparent"></div>
+        </div>
+
+        <!-- Top pill banner -->
+        <div class="relative z-10">
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-white/15 text-cyan-300 backdrop-blur-md border border-white/20">
+            <i data-lucide="compass" class="w-3.5 h-3.5 text-brand-tertiary"></i>
+            TRIPZY · GO WHERE THE VIBE IS
+          </span>
+        </div>
+
+        <!-- Center Overlay Text -->
+        <div class="relative z-10 max-w-3xl my-auto text-left py-6">
+          <span class="text-brand-tertiary font-bold tracking-widest text-xs md:text-sm uppercase block mb-2">TRIPZY JOURNEYS</span>
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-4">
+            Find your next <br class="hidden sm:inline"/>main-character trip
+          </h1>
+          <p class="text-slate-300 text-sm sm:text-base md:text-lg max-w-xl font-normal leading-relaxed mb-6">
+            Discover places worth posting, stays worth remembering, and adventures made for your crew.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <button onclick="switchView('explore')" class="px-6 py-3.5 rounded-full bg-brand-primary hover:bg-brand-primaryHover text-white font-bold text-sm shadow-lg hover:shadow-cyan-900/40 transition flex items-center gap-2">
+              <span>Explore Now</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+            <button onclick="focusSearchPanel()" class="px-6 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-semibold text-sm backdrop-blur-md border border-white/20 transition flex items-center gap-2">
+              <i data-lucide="search" class="w-4 h-4"></i>
+              <span>Search Trips</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Floating Search Panel -->
+        <div id="search-panel" class="relative z-20 w-full mt-4 bg-white/95 backdrop-blur-lg border border-brand-border rounded-[20px] p-4 sm:p-5 shadow-2xl transition transform hover:-translate-y-0.5">
+          <!-- Travel Type Switcher -->
+          <div class="flex items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+            <button class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-cyan-100 text-brand-primary border border-cyan-300 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> All Packages
+            </button>
+            <button onclick="filterExploreTab('flights')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold text-brand-neutral hover:bg-slate-100 flex items-center gap-1.5">
+              <i data-lucide="plane" class="w-3.5 h-3.5"></i> Flights
+            </button>
+            <button onclick="filterExploreTab('hotels')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold text-brand-neutral hover:bg-slate-100 flex items-center gap-1.5">
+              <i data-lucide="hotel" class="w-3.5 h-3.5"></i> Hotels
+            </button>
+          </div>
+
+          <!-- Input Fields Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <!-- Destination -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-cyan-100 text-brand-primary flex items-center justify-center shrink-0">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-grow">
+                <span class="block text-[10px] font-bold text-brand-neutral uppercase tracking-wider">Destination</span>
+                <input id="search-dest-input" type="text" placeholder="Where to? (e.g. Goa, Kashmir)" class="w-full bg-transparent text-xs font-semibold text-brand-dark focus:outline-none placeholder:text-slate-400"/>
+              </div>
+            </div>
+
+            <!-- Travel Date -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-brand-secondary flex items-center justify-center shrink-0">
+                <i data-lucide="calendar-days" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-grow">
+                <span class="block text-[10px] font-bold text-brand-neutral uppercase tracking-wider">Travel Date</span>
+                <input type="date" value="2026-05-15" class="w-full bg-transparent text-xs font-semibold text-brand-dark focus:outline-none"/>
+              </div>
+            </div>
+
+            <!-- Travellers -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                <i data-lucide="users" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-grow">
+                <span class="block text-[10px] font-bold text-brand-neutral uppercase tracking-wider">Travellers</span>
+                <select class="w-full bg-transparent text-xs font-semibold text-brand-dark focus:outline-none">
+                  <option>1 Adult</option>
+                  <option selected>2 Travellers (Couple)</option>
+                  <option>Family (3-4 Members)</option>
+                  <option>Group (5+ Members)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Search Action Button -->
+            <div class="flex items-center">
+              <button onclick="executeHomeSearch()" class="w-full h-full min-h-[46px] rounded-xl bg-brand-primary hover:bg-brand-primaryHover text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-cyan-900/30 transition">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                <span>SEARCH</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POPULAR DESTINATIONS SECTION (5 Specified Cards) -->
+      <div>
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-widest text-brand-primary">Curated Escapes</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-brand-dark tracking-tight">Popular Destinations</h2>
+            <p class="text-sm text-brand-neutral mt-1">Explore top-rated travel retreats across beaches, backwaters, and peaks.</p>
+          </div>
+          <button onclick="switchView('explore')" class="text-xs font-bold text-brand-primary hover:underline flex items-center gap-1">
+            <span>View All 13 Packages</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          
+          <!-- Destination 1: Goa -->
+          <div class="bg-white border border-brand-border rounded-custom p-3 shadow-soft hover:shadow-floating transition-all group flex flex-col justify-between">
+            <div>
+              <div class="img-placeholder ratio-card mb-3">
+                <i data-lucide="palmtree" class="w-6 h-6 text-brand-primary/60 mb-1"></i>
+                <span class="text-[10px] font-mono text-slate-600 font-medium">[IMAGE_PLACEHOLDER_HOME_GOA]</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-brand-dark">Goa</h3>
+                <span class="badge-pill bg-cyan-100 text-brand-primary">Beach</span>
+              </div>
+              <p class="text-xs text-brand-neutral mt-1">Beach Escape & Coastal Sunset</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-brand-neutral uppercase block font-semibold">Starts from</span>
+                <span class="text-sm font-extrabold text-brand-dark">₹12,999</span>
+              </div>
+              <button onclick="selectTripQuick(1)" class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-brand-primary group-hover:text-white text-brand-dark flex items-center justify-center transition">
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Destination 2: Kerala -->
+          <div class="bg-white border border-brand-border rounded-custom p-3 shadow-soft hover:shadow-floating transition-all group flex flex-col justify-between">
+            <div>
+              <div class="img-placeholder ratio-card mb-3">
+                <i data-lucide="waves" class="w-6 h-6 text-brand-secondary/60 mb-1"></i>
+                <span class="text-[10px] font-mono text-slate-600 font-medium">[IMAGE_PLACEHOLDER_HOME_KERALA]</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-brand-dark">Kerala</h3>
+                <span class="badge-pill bg-emerald-100 text-brand-secondary">Serene</span>
+              </div>
+              <p class="text-xs text-brand-neutral mt-1">Backwater Escape & Lagoons</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-brand-neutral uppercase block font-semibold">Starts from</span>
+                <span class="text-sm font-extrabold text-brand-dark">₹16,999</span>
+              </div>
+              <button onclick="selectTripQuick(2)" class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-brand-primary group-hover:text-white text-brand-dark flex items-center justify-center transition">
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Destination 3: Manali -->
+          <div class="bg-white border border-brand-border rounded-custom p-3 shadow-soft hover:shadow-floating transition-all group flex flex-col justify-between">
+            <div>
+              <div class="img-placeholder ratio-card mb-3">
+                <i data-lucide="mountain" class="w-6 h-6 text-slate-600 mb-1"></i>
+                <span class="text-[10px] font-mono text-slate-600 font-medium">[IMAGE_PLACEHOLDER_HOME_MANALI]</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-brand-dark">Manali</h3>
+                <span class="badge-pill bg-blue-100 text-blue-700">Alpine</span>
+              </div>
+              <p class="text-xs text-brand-neutral mt-1">Mountain Adventure & Snow Peaks</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-brand-neutral uppercase block font-semibold">Starts from</span>
+                <span class="text-sm font-extrabold text-brand-dark">₹14,999</span>
+              </div>
+              <button onclick="selectTripQuick(3)" class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-brand-primary group-hover:text-white text-brand-dark flex items-center justify-center transition">
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Destination 4: Jaipur -->
+          <div class="bg-white border border-brand-border rounded-custom p-3 shadow-soft hover:shadow-floating transition-all group flex flex-col justify-between">
+            <div>
+              <div class="img-placeholder ratio-card mb-3">
+                <i data-lucide="landmark" class="w-6 h-6 text-amber-700/60 mb-1"></i>
+                <span class="text-[10px] font-mono text-slate-600 font-medium">[IMAGE_PLACEHOLDER_HOME_JAIPUR]</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-brand-dark">Jaipur</h3>
+                <span class="badge-pill bg-amber-100 text-amber-800">Culture</span>
+              </div>
+              <p class="text-xs text-brand-neutral mt-1">Royal Heritage & Historic Forts</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-brand-neutral uppercase block font-semibold">Starts from</span>
+                <span class="text-sm font-extrabold text-brand-dark">₹9,999</span>
+              </div>
+              <button onclick="selectTripQuick(4)" class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-brand-primary group-hover:text-white text-brand-dark flex items-center justify-center transition">
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Destination 5: Kashmir -->
+          <div class="bg-white border border-brand-border rounded-custom p-3 shadow-soft hover:shadow-floating transition-all group flex flex-col justify-between">
+            <div>
+              <div class="img-placeholder ratio-card mb-3">
+                <i data-lucide="cloud-sun" class="w-6 h-6 text-brand-primary/60 mb-1"></i>
+                <span class="text-[10px] font-mono text-slate-600 font-medium">[IMAGE_PLACEHOLDER_HOME_KASHMIR]</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-base text-brand-dark">Kashmir</h3>
+                <span class="badge-pill bg-cyan-100 text-brand-primary">Heaven</span>
+              </div>
+              <p class="text-xs text-brand-neutral mt-1">Paradise Escape & Dal Lake</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-brand-neutral uppercase block font-semibold">Starts from</span>
+                <span class="text-sm font-extrabold text-brand-dark">₹24,999</span>
+              </div>
+              <button onclick="selectTripQuick(8)" class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-brand-primary group-hover:text-white text-brand-dark flex items-center justify-center transition">
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- EXPLORE CATEGORIES: "Explore Your Way" -->
+      <div class="bg-white border border-brand-border rounded-custom p-6 sm:p-8 shadow-soft">
+        <div class="text-center max-w-xl mx-auto mb-6">
+          <span class="text-xs font-extrabold uppercase tracking-widest text-brand-primary">Custom Travel Formats</span>
+          <h2 class="text-2xl font-extrabold text-brand-dark mt-1">Explore Your Way</h2>
+          <p class="text-xs sm:text-sm text-brand-neutral">Choose your preferred mode of discovery across our nationwide inventory.</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          
+          <button onclick="filterExploreTab('flights')" class="p-4 rounded-xl border border-slate-200 hover:border-brand-primary hover:bg-cyan-50/50 transition-all flex flex-col items-center text-center group">
+            <div class="w-12 h-12 rounded-full bg-cyan-100 group-hover:bg-brand-primary group-hover:text-white text-brand-primary flex items-center justify-center mb-2.5 transition">
+              <i data-lucide="plane" class="w-6 h-6"></i>
+            </div>
+            <span class="font-bold text-sm text-brand-dark">Flights</span>
+            <span class="text-[10px] text-brand-neutral">11 Domestic Routes</span>
+          </button>
+
+          <button onclick="filterExploreTab('hotels')" class="p-4 rounded-xl border border-slate-200 hover:border-brand-primary hover:bg-cyan-50/50 transition-all flex flex-col items-center text-center group">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 group-hover:bg-brand-secondary group-hover:text-white text-brand-secondary flex items-center justify-center mb-2.5 transition">
+              <i data-lucide="hotel" class="w-6 h-6"></i>
+            </div>
+            <span class="font-bold text-sm text-brand-dark">Hotels</span>
+            <span class="text-[10px] text-brand-neutral">13 Verified Stays</span>
+          </button>
+
+          <button onclick="filterExploreTab('trips')" class="p-4 rounded-xl border border-slate-200 hover:border-brand-primary hover:bg-cyan-50/50 transition-all flex flex-col items-center text-center group">
+            <div class="w-12 h-12 rounded-full bg-blue-100 group-hover:bg-blue-600 group-hover:text-white text-blue-600 flex items-center justify-center mb-2.5 transition">
+              <i data-lucide="map" class="w-6 h-6"></i>
+            </div>
+            <span class="font-bold text-sm text-brand-dark">Trips</span>
+            <span class="text-[10px] text-brand-neutral">Complete Itineraries</span>
+          </button>
+
+          <button onclick="filterExploreTab('food')" class="p-4 rounded-xl border border-slate-200 hover:border-brand-primary hover:bg-cyan-50/50 transition-all flex flex-col items-center text-center group">
+            <div class="w-12 h-12 rounded-full bg-amber-100 group-hover:bg-amber-600 group-hover:text-white text-amber-700 flex items-center justify-center mb-2.5 transition">
+              <i data-lucide="utensils" class="w-6 h-6"></i>
+            </div>
+            <span class="font-bold text-sm text-brand-dark">Food</span>
+            <span class="text-[10px] text-brand-neutral">Culinary Experiences</span>
+          </button>
+
+          <button onclick="filterExploreTab('adventure')" class="p-4 rounded-xl border border-slate-200 hover:border-brand-primary hover:bg-cyan-50/50 transition-all flex flex-col items-center text-center group col-span-2 sm:col-span-1">
+            <div class="w-12 h-12 rounded-full bg-teal-100 group-hover:bg-teal-700 group-hover:text-white text-teal-700 flex items-center justify-center mb-2.5 transition">
+              <i data-lucide="mountain" class="w-6 h-6"></i>
+            </div>
+            <span class="font-bold text-sm text-brand-dark">Adventure</span>
+            <span class="text-[10px] text-brand-neutral">Rafting, Treks & Water</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- SPECIAL OFFERS SECTION -->
+      <div class="bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-cyan-500/10 border-2 border-brand-tertiary/40 rounded-custom p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-soft">
+        <div class="flex-grow space-y-2 text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase bg-amber-100 text-amber-900 border border-amber-300">
+            <i data-lucide="tag" class="w-3.5 h-3.5 text-brand-tertiary"></i>
+            <span>Exclusive Demonstration Deals</span>
+          </div>
+          <h3 class="text-2xl font-extrabold text-brand-dark">Plan More. Save More.</h3>
+          <p class="text-sm text-brand-neutral max-w-xl">
+            Get special offers on selected trips, hotels and flights. Use coupon code <strong class="text-brand-dark bg-amber-100 px-2 py-0.5 rounded">TRIPZY2026</strong> for simulated ₹2,500 off on complete package checkouts.
+          </p>
+          <div class="pt-2">
+            <button onclick="switchView('explore')" class="px-5 py-2.5 rounded-full bg-brand-tertiary hover:bg-amber-600 text-slate-950 font-bold text-xs uppercase tracking-wider transition shadow-sm">
+              View Offers
+            </button>
+          </div>
+        </div>
+
+        <div class="w-full md:w-80 shrink-0">
+          <div class="img-placeholder ratio-card border-amber-300 bg-amber-50/70">
+            <i data-lucide="gift" class="w-8 h-8 text-brand-tertiary mb-1"></i>
+            <span class="text-xs font-mono font-semibold text-amber-900">[IMAGE_PLACEHOLDER_SPECIAL_OFFER]</span>
+            <span class="text-[10px] text-amber-800/80 mt-1">Save up to 35% on domestic escapes</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 2: EXPLORE TRIPS (With Trips, Flights, Hotels, Food) -->
+    <!-- ======================================================================= -->
+    <section id="view-explore" class="page-view hidden space-y-10">
+      
+      <!-- Header & Subtitle -->
+      <div class="border-b border-slate-200 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-extrabold uppercase tracking-widest text-brand-primary">Travel Discovery Engine</span>
+          <h1 class="text-3xl font-extrabold text-brand-dark tracking-tight">Explore Trips & Travel Inventory</h1>
+          <p class="text-sm text-brand-neutral mt-1">Find your next unforgettable journey. Browse all 13 trip packages, 11 flight routes, and 13 resorts.</p>
+        </div>
+        <!-- Segment Switcher -->
+        <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+          <button id="exp-subtab-trips" onclick="switchExploreSubtab('trips')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition bg-brand-primary text-white">
+            Trips (13)
+          </button>
+          <button id="exp-subtab-flights" onclick="switchExploreSubtab('flights')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-brand-neutral hover:text-brand-primary transition">
+            Flights (11)
+          </button>
+          <button id="exp-subtab-hotels" onclick="switchExploreSubtab('hotels')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-brand-neutral hover:text-brand-primary transition">
+            Hotels (13)
+          </button>
+        </div>
+      </div>
+
+      <!-- FILTER CONTROLS BAR -->
+      <div class="bg-white border border-brand-border rounded-custom p-4 shadow-soft">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
+          <!-- Destination Filter -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1 flex items-center gap-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-brand-primary"></i> Destination
+            </label>
+            <select id="filter-dest" onchange="applyTripFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium focus:outline-none focus:border-brand-primary">
+              <option value="all">All Destinations</option>
+              <option value="Goa">Goa</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Manali">Manali</option>
+              <option value="Jaipur">Jaipur</option>
+              <option value="Ooty">Ooty</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Rishikesh">Rishikesh</option>
+              <option value="Kashmir">Kashmir</option>
+              <option value="Andaman">Andaman</option>
+              <option value="Pondicherry">Pondicherry</option>
+              <option value="Udaipur">Udaipur</option>
+              <option value="Munnar">Munnar</option>
+              <option value="Bali">Bali</option>
+            </select>
+          </div>
+
+          <!-- Budget Filter -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1 flex items-center gap-1">
+              <i data-lucide="credit-card" class="w-3.5 h-3.5 text-brand-secondary"></i> Budget
+            </label>
+            <select id="filter-budget" onchange="applyTripFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium focus:outline-none focus:border-brand-primary">
+              <option value="all">Any Budget</option>
+              <option value="under10k">Under ₹10,000</option>
+              <option value="10k20k">₹10,000 – ₹20,000</option>
+              <option value="above20k">Above ₹20,000</option>
+            </select>
+          </div>
+
+          <!-- Duration Filter -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1 flex items-center gap-1">
+              <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-600"></i> Duration
+            </label>
+            <select id="filter-duration" onchange="applyTripFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium focus:outline-none focus:border-brand-primary">
+              <option value="all">Any Duration</option>
+              <option value="3days">3 Days / 2 Nights</option>
+              <option value="4days">4 Days / 3 Nights</option>
+              <option value="5days">5 Days / 4 Nights</option>
+              <option value="6days">6 Days / 5 Nights</option>
+            </select>
+          </div>
+
+          <!-- Travel Type -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1 flex items-center gap-1">
+              <i data-lucide="compass" class="w-3.5 h-3.5 text-cyan-600"></i> Travel Type
+            </label>
+            <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium focus:outline-none focus:border-brand-primary">
+              <option>All Types</option>
+              <option>Beach Retreat</option>
+              <option>Mountain / Alpine</option>
+              <option>Heritage / Royal</option>
+              <option>Island / Adventure</option>
+            </select>
+          </div>
+
+          <!-- Rating -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1 flex items-center gap-1">
+              <i data-lucide="star" class="w-3.5 h-3.5 text-brand-tertiary"></i> Rating
+            </label>
+            <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium focus:outline-none focus:border-brand-primary">
+              <option>4.5+ Stars</option>
+              <option>4.7+ Stars</option>
+              <option>Top Rated Only</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SUBSECTION A: ALL 13 TRIP PACKAGES -->
+      <!-- ========================================== -->
+      <div id="subtab-content-trips" class="space-y-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-brand-dark flex items-center gap-2">
+            <span>Featured Trip Packages</span>
+            <span class="text-xs bg-slate-200 text-brand-dark px-2 py-0.5 rounded-full font-extrabold" id="trip-count-badge">13 Packages</span>
+          </h2>
+          <span class="text-xs text-brand-neutral">Showing verified all-inclusive itineraries</span>
+        </div>
+
+        <div id="trips-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 13 Trips dynamically rendered or seeded below -->
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SUBSECTION B: ALL 11 FLIGHT ROUTES -->
+      <!-- ========================================== -->
+      <div id="subtab-content-flights" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-brand-dark">Demonstration Flight Schedules</h2>
+            <p class="text-xs text-brand-neutral">11 Domestic routes across top carrier partners (IndiGo, Air India, Akasa, Air India Express)</p>
+          </div>
+          <span class="badge-pill bg-amber-100 text-amber-900 border border-amber-300">Demo Pricing Active</span>
+        </div>
+
+        <div id="flights-container" class="space-y-3">
+          <!-- 11 Flights populated via JS -->
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- SUBSECTION C: ALL 13 HOTELS -->
+      <!-- ========================================== -->
+      <div id="subtab-content-hotels" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-brand-dark">Curated Hotel & Resort Collection</h2>
+            <p class="text-xs text-brand-neutral">13 Handpicked stays with included food experiences & amenities</p>
+          </div>
+          <span class="badge-pill bg-cyan-100 text-brand-primary">Best Price Guarantee</span>
+        </div>
+
+        <div id="hotels-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 13 Hotels populated via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 3: BOOKING / TRIP DETAILS PAGE (Connected Experience) -->
+    <!-- ======================================================================= -->
+    <section id="view-booking" class="page-view hidden space-y-8">
+      
+      <!-- Breadcrumb Navigation -->
+      <div class="flex items-center gap-2 text-xs font-semibold text-brand-neutral">
+        <button onclick="switchView('explore')" class="hover:text-brand-primary flex items-center gap-1">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Explore
+        </button>
+        <span>/</span>
+        <span id="detail-breadcrumb" class="text-brand-dark font-bold">Goa Beach Escape</span>
+      </div>
+
+      <!-- Top Hero Section for Selected Trip -->
+      <div class="bg-white border border-brand-border rounded-[22px] overflow-hidden shadow-soft p-6 sm:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <div class="lg:col-span-7 space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="detail-badge-dest" class="badge-pill bg-cyan-100 text-brand-primary font-bold">Goa, India</span>
+              <span id="detail-badge-rating" class="badge-pill bg-amber-100 text-amber-800 font-bold flex items-center gap-1">
+                <i data-lucide="star" class="w-3 h-3 fill-amber-500 text-amber-500"></i> 4.7 (128 Reviews)
+              </span>
+              <span id="detail-badge-duration" class="badge-pill bg-slate-100 text-brand-neutral font-medium">4 Days / 3 Nights</span>
+            </div>
+
+            <h1 id="detail-title" class="text-2xl sm:text-4xl font-extrabold text-brand-dark tracking-tight">
+              Goa Beach Escape
+            </h1>
+            <p id="detail-description" class="text-sm text-brand-neutral leading-relaxed">
+              Relax on beautiful beaches, explore local attractions and enjoy Goa's coastal culture with premium beachside resort stays and verified transport.
+            </p>
+
+            <!-- Quick Trip Specs -->
+            <div class="grid grid-cols-3 gap-3 pt-2">
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                <span class="text-[10px] text-brand-neutral font-bold uppercase block">Travel Dates</span>
+                <span class="text-xs font-bold text-brand-dark">May 15 – May 18, 2026</span>
+              </div>
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                <span class="text-[10px] text-brand-neutral font-bold uppercase block">Travellers</span>
+                <span class="text-xs font-bold text-brand-dark">2 Adults</span>
+              </div>
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                <span class="text-[10px] text-brand-neutral font-bold uppercase block">Starting Fare</span>
+                <span id="detail-quick-price" class="text-xs font-bold text-brand-primary">₹12,999 / person</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Image Placeholder -->
+          <div class="lg:col-span-5">
+            <div class="img-placeholder ratio-card bg-slate-100 shadow-inner">
+              <i data-lucide="image" class="w-10 h-10 text-brand-primary/60 mb-2"></i>
+              <span class="text-xs font-mono font-bold text-slate-700">[IMAGE_PLACEHOLDER_TRIP_DETAIL_HERO]</span>
+              <span class="text-[10px] text-brand-neutral mt-1">High-Resolution Destination Photography</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT & STICKY SUMMARY GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left 8 Columns: Detail Modules -->
+        <div class="lg:col-span-8 space-y-8">
+          
+          <!-- Itinerary Timeline -->
+          <div class="bg-white border border-brand-border rounded-custom p-6 shadow-soft space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <h2 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                <i data-lucide="calendar-check" class="w-5 h-5 text-brand-primary"></i>
+                <span>Curated Day-by-Day Itinerary</span>
+              </h2>
+              <span class="text-xs text-brand-neutral font-medium">All transfers & activities scheduled</span>
+            </div>
+
+            <div class="space-y-6 relative before:absolute before:inset-0 before:left-3.5 before:w-0.5 before:bg-slate-200">
+              
+              <!-- DAY 1 -->
+              <div class="relative pl-8 space-y-1">
+                <div class="absolute left-1.5 top-1.5 w-4 h-4 rounded-full bg-brand-primary border-4 border-white shadow-sm"></div>
+                <div class="flex items-center gap-2">
+                  <span class="badge-pill bg-cyan-100 text-brand-primary font-bold">DAY 1</span>
+                  <h3 class="font-bold text-sm text-brand-dark">Arrival, Check-in & Sunset Welcome</h3>
+                </div>
+                <p class="text-xs text-brand-neutral">Airport arrival transfer by private AC sedan. Resort check-in, orientation beverage, followed by coastal sunset stroll and evening Goan welcome dinner.</p>
+              </div>
+
+              <!-- DAY 2 -->
+              <div class="relative pl-8 space-y-1">
+                <div class="absolute left-1.5 top-1.5 w-4 h-4 rounded-full bg-brand-primary border-4 border-white shadow-sm"></div>
+                <div class="flex items-center gap-2">
+                  <span class="badge-pill bg-cyan-100 text-brand-primary font-bold">DAY 2</span>
+                  <h3 class="font-bold text-sm text-brand-dark">Local Sightseeing & Heritage Exploration</h3>
+                </div>
+                <p class="text-xs text-brand-neutral">Complimentary buffet breakfast. Guided visit to coastal fortresses, local spice plantations, and historic Portuguese quarter with authentic lunch stop.</p>
+              </div>
+
+              <!-- DAY 3 -->
+              <div class="relative pl-8 space-y-1">
+                <div class="absolute left-1.5 top-1.5 w-4 h-4 rounded-full bg-brand-primary border-4 border-white shadow-sm"></div>
+                <div class="flex items-center gap-2">
+                  <span class="badge-pill bg-cyan-100 text-brand-primary font-bold">DAY 3</span>
+                  <h3 class="font-bold text-sm text-brand-dark">Adventure, Water Sports & Leisure</h3>
+                </div>
+                <p class="text-xs text-brand-neutral">Breakfast at resort. Optional speed boat, parasailing, or private catamaran cruise. Evening leisure along pristine beach shacks with live music.</p>
+              </div>
+
+              <!-- DAY 4 -->
+              <div class="relative pl-8 space-y-1">
+                <div class="absolute left-1.5 top-1.5 w-4 h-4 rounded-full bg-brand-secondary border-4 border-white shadow-sm"></div>
+                <div class="flex items-center gap-2">
+                  <span class="badge-pill bg-emerald-100 text-brand-secondary font-bold">DAY 4</span>
+                  <h3 class="font-bold text-sm text-brand-dark">Departure & Airport Transfer</h3>
+                </div>
+                <p class="text-xs text-brand-neutral">Relaxed morning breakfast, resort souvenir checkout, and punctual transfer to departure terminal for scheduled return flight.</p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- FOOD & DINING SYSTEM SECTION (Required Item 11) -->
+          <div class="bg-white border border-brand-border rounded-custom p-6 shadow-soft space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h2 class="text-lg font-bold text-brand-dark flex items-center gap-2">
+                  <i data-lucide="utensils" class="w-5 h-5 text-amber-600"></i>
+                  <span>Integrated Food & Dining Experiences</span>
+                </h2>
+                <p class="text-xs text-brand-neutral">Culinary traditions and authentic dining included with your package</p>
+              </div>
+              <span class="badge-pill bg-amber-100 text-amber-900">Food Experiences</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              
+              <!-- Card 1: Breakfast -->
+              <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 flex gap-3 items-center">
+                <div class="w-20 h-20 shrink-0 img-placeholder p-1 rounded-lg">
+                  <i data-lucide="coffee" class="w-5 h-5 text-amber-600"></i>
+                  <span class="text-[8px] font-mono text-slate-700">[IMAGE_PLACEHOLDER_FOOD]</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-xs text-brand-dark">Breakfast Buffet</h4>
+                    <span class="text-[9px] font-bold text-brand-secondary bg-emerald-100 px-1.5 py-0.5 rounded">Included</span>
+                  </div>
+                  <p class="text-[11px] text-brand-neutral">Continental & authentic regional morning spread daily at the resort restaurant.</p>
+                </div>
+              </div>
+
+              <!-- Card 2: Local Experience -->
+              <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 flex gap-3 items-center">
+                <div class="w-20 h-20 shrink-0 img-placeholder p-1 rounded-lg">
+                  <i data-lucide="chef-hat" class="w-5 h-5 text-brand-primary"></i>
+                  <span class="text-[8px] font-mono text-slate-700">[IMAGE_PLACEHOLDER_FOOD]</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <h4 id="detail-food-name" class="font-bold text-xs text-brand-dark">Regional Experience</h4>
+                    <span class="text-[9px] font-bold text-brand-secondary bg-emerald-100 px-1.5 py-0.5 rounded">Included</span>
+                  </div>
+                  <p id="detail-food-desc" class="text-[11px] text-brand-neutral">Traditional local lunch & dining curated with authentic village chefs.</p>
+                </div>
+              </div>
+
+              <!-- Card 3: Optional Seafood / Special Dinner -->
+              <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 flex gap-3 items-center">
+                <div class="w-20 h-20 shrink-0 img-placeholder p-1 rounded-lg">
+                  <i data-lucide="soup" class="w-5 h-5 text-cyan-600"></i>
+                  <span class="text-[8px] font-mono text-slate-700">[IMAGE_PLACEHOLDER_FOOD]</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-xs text-brand-dark">Private Beachside Dinner</h4>
+                    <span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">Optional (₹1,999)</span>
+                  </div>
+                  <p class="text-[11px] text-brand-neutral">Chef-curated 4-course candlelit dinner setup right on the ocean sand.</p>
+                </div>
+              </div>
+
+              <!-- Card 4: High Tea & Snacks -->
+              <div class="p-3 border border-slate-200 rounded-xl bg-slate-50 flex gap-3 items-center">
+                <div class="w-20 h-20 shrink-0 img-placeholder p-1 rounded-lg">
+                  <i data-lucide="cake" class="w-5 h-5 text-emerald-600"></i>
+                  <span class="text-[8px] font-mono text-slate-700">[IMAGE_PLACEHOLDER_FOOD]</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <h4 class="font-bold text-xs text-brand-dark">Sunset Tea & Savories</h4>
+                    <span class="text-[9px] font-bold text-brand-secondary bg-emerald-100 px-1.5 py-0.5 rounded">Included</span>
+                  </div>
+                  <p class="text-[11px] text-brand-neutral">Afternoon artisanal brews and regional snacks during beach sunset hours.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Inclusions & Exclusions -->
+          <div class="bg-white border border-brand-border rounded-custom p-6 shadow-soft grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="font-bold text-sm text-brand-dark mb-3 flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-brand-secondary"></i>
+                <span>Package Inclusions</span>
+              </h3>
+              <ul class="text-xs text-brand-neutral space-y-2">
+                <li class="flex items-center gap-2">
+                  <i data-lucide="check" class="w-3.5 h-3.5 text-brand-secondary"></i> 3 Nights 4-Star Resort Accommodation
+                </li>
+                <li class="flex items-center gap-2">
+                  <i data-lucide="check" class="w-3.5 h-3.5 text-brand-secondary"></i> All Breakfasts & Regional Signature Dining
+                </li>
+                <li class="flex items-center gap-2">
+                  <i data-lucide="check" class="w-3.5 h-3.5 text-brand-secondary"></i> Dedicated Private Airport Transfers
+                </li>
+                <li class="flex items-center gap-2">
+                  <i data-lucide="check" class="w-3.5 h-3.5 text-brand-secondary"></i> Guided Sightseeing & Entry Tickets
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="font-bold text-sm text-brand-dark mb-3 flex items-center gap-2">
+                <i data-lucide="x" class="w-4 h-4 text-slate-400"></i>
+                <span>Package Exclusions</span>
+              </h3>
+              <ul class="text-xs text-brand-neutral space-y-2">
+                <li class="flex items-center gap-2">
+                  <i data-lucide="minus" class="w-3.5 h-3.5 text-slate-400"></i> Extra personal expenses & laundry
+                </li>
+                <li class="flex items-center gap-2">
+                  <i data-lucide="minus" class="w-3.5 h-3.5 text-slate-400"></i> Optional extreme water sport gear fees
+                </li>
+                <li class="flex items-center gap-2">
+                  <i data-lucide="minus" class="w-3.5 h-3.5 text-slate-400"></i> Travel medical insurance (available as add-on)
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right 4 Columns: STICKY BOOKING SUMMARY (Desktop) -->
+        <div class="lg:col-span-4 sticky top-28 space-y-4">
+          
+          <div class="bg-white border border-brand-border rounded-custom p-6 shadow-floating space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 class="font-extrabold text-base text-brand-dark">Booking Summary</h3>
+              <span class="badge-pill bg-cyan-100 text-brand-primary font-bold">2 Travellers</span>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+              <div class="flex justify-between items-center text-slate-600">
+                <span>Base Trip Package</span>
+                <span id="sum-trip-price" class="font-bold text-slate-800">₹16,999</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-600">
+                <span>Selected Flight (Demo IndiGo)</span>
+                <span id="sum-flight-price" class="font-bold text-slate-800">₹5,499</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-600">
+                <span>Resort Stay Upgrade (Ocean View)</span>
+                <span id="sum-hotel-price" class="font-bold text-slate-800">₹4,999</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-600">
+                <span>Dining Package & Breakfast</span>
+                <span id="sum-food-price" class="font-bold text-slate-800">₹1,999</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-600">
+                <span>Taxes & GST (Simulation)</span>
+                <span id="sum-tax-price" class="font-bold text-slate-800">₹1,000</span>
+              </div>
+
+              <div class="pt-3 border-t border-slate-200 flex justify-between items-baseline">
+                <div>
+                  <span class="text-xs text-brand-neutral uppercase tracking-wider block font-bold">Total Payable</span>
+                  <span class="text-[10px] text-emerald-600 font-semibold">Includes all taxes & fees</span>
+                </div>
+                <span id="sum-total-price" class="text-xl font-extrabold text-brand-primary">₹30,496</span>
+              </div>
+            </div>
+
+            <!-- Confirmation Action Button -->
+            <button onclick="confirmBooking()" class="w-full py-3.5 rounded-xl bg-brand-secondary hover:bg-brand-secondaryHover text-white font-extrabold text-sm tracking-wide shadow-lg hover:shadow-emerald-900/30 transition flex items-center justify-center gap-2">
+              <i data-lucide="credit-card" class="w-4 h-4"></i>
+              <span>Confirm Booking</span>
+            </button>
+
+            <div class="text-center">
+              <span class="text-[10px] text-brand-neutral flex items-center justify-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-secondary"></i>
+                College Web Tech Prototype • Secure Demonstration
+              </span>
+            </div>
+          </div>
+
+          <!-- Customer Service Note -->
+          <div class="bg-cyan-50/70 border border-cyan-200 rounded-xl p-3.5 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-cyan-100 text-brand-primary flex items-center justify-center shrink-0">
+              <i data-lucide="phone-call" class="w-4 h-4"></i>
+            </div>
+            <div class="text-xs">
+              <span class="font-bold text-brand-dark block">24/7 Horizon Concierge</span>
+              <span class="text-brand-neutral text-[11px]">Free date adjustments up to 48 hours prior</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 4: PROFILE & TRIPS PAGE -->
+    <!-- ======================================================================= -->
+    <section id="view-profile" class="page-view hidden space-y-10">
+      
+      <!-- Top Profile Overview Card -->
+      <div class="bg-white border border-brand-border rounded-[22px] p-6 sm:p-8 shadow-soft">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
+          
+          <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+            <!-- Profile Avatar Placeholder (1:1) -->
+            <div class="w-24 h-24 rounded-full img-placeholder ratio-avatar border-2 border-brand-primary p-1 shrink-0 overflow-hidden shadow-sm">
+              <i data-lucide="user" class="w-8 h-8 text-brand-primary mb-1"></i>
+              <span class="text-[7px] font-mono font-bold text-slate-700">[PROFILE_IMAGE_PLACEHOLDER]</span>
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 justify-center sm:justify-start">
+                <h1 class="text-2xl font-extrabold text-brand-dark">Aarav Sharma</h1>
+                <span class="badge-pill bg-cyan-100 text-brand-primary">Horizon Explorer</span>
+              </div>
+              <p class="text-xs text-brand-neutral">aarav.sharma@example.com • Member since Jan 2025</p>
+              <div class="pt-1 flex items-center gap-2 justify-center sm:justify-start">
+                <button class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-brand-dark border border-slate-200 transition">
+                  Edit Profile
+                </button>
+                <button class="px-3 py-1 rounded-full text-xs font-semibold text-brand-neutral hover:text-brand-dark">
+                  Preferences
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Statistics -->
+          <div class="grid grid-cols-3 gap-3 w-full sm:w-auto">
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center min-w-[90px]">
+              <span class="text-xl font-extrabold text-brand-primary block">6</span>
+              <span class="text-[10px] text-brand-neutral font-semibold uppercase">Trips Taken</span>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center min-w-[90px]">
+              <span class="text-xl font-extrabold text-brand-secondary block">1</span>
+              <span class="text-[10px] text-brand-neutral font-semibold uppercase">Upcoming</span>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center min-w-[90px]">
+              <span class="text-xl font-extrabold text-amber-600 block">13</span>
+              <span class="text-[10px] text-brand-neutral font-semibold uppercase">Saved</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- UPCOMING TRIPS & BOOKINGS -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-brand-dark flex items-center gap-2">
+            <i data-lucide="calendar-check" class="w-5 h-5 text-brand-primary"></i>
+            <span>Upcoming Trip Bookings</span>
+          </h2>
+          <span class="badge-pill bg-emerald-100 text-brand-secondary">1 Active Booking</span>
+        </div>
+
+        <!-- Upcoming Trip Card -->
+        <div class="bg-white border border-brand-border rounded-custom p-5 shadow-soft hover:shadow-floating transition-all">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+            
+            <div class="md:col-span-3">
+              <div class="img-placeholder ratio-card rounded-xl">
+                <i data-lucide="palmtree" class="w-6 h-6 text-brand-primary mb-1"></i>
+                <span class="text-[9px] font-mono text-slate-700">[IMAGE_PLACEHOLDER_TRIP_GOA]</span>
+              </div>
+            </div>
+
+            <div class="md:col-span-6 space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="badge-pill bg-emerald-100 text-brand-secondary font-bold">Confirmed • HC-2026-001</span>
+                <span class="text-xs text-brand-neutral">May 15 – May 18, 2026</span>
+              </div>
+              <h3 class="text-lg font-bold text-brand-dark">Goa Beach Escape & Coastal Retreat</h3>
+              <div class="text-xs text-brand-neutral space-y-1">
+                <p class="flex items-center gap-1.5"><i data-lucide="hotel" class="w-3.5 h-3.5 text-brand-primary"></i> Stay: Ocean Pearl Resort (Goa)</p>
+                <p class="flex items-center gap-1.5"><i data-lucide="plane" class="w-3.5 h-3.5 text-brand-primary"></i> Flight: IndiGo 6E-204 (Delhi → Goa)</p>
+                <p class="flex items-center gap-1.5"><i data-lucide="utensils" class="w-3.5 h-3.5 text-amber-600"></i> Food: Breakfast included + Local Goan experience</p>
+              </div>
+            </div>
+
+            <div class="md:col-span-3 flex md:flex-col items-center md:items-end justify-between gap-3 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
+              <div>
+                <span class="text-[10px] text-brand-neutral uppercase block font-semibold">Total Paid</span>
+                <span class="text-base font-extrabold text-brand-primary">₹30,496</span>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="switchView('booking')" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-dark text-xs font-bold transition">
+                  View Details
+                </button>
+                <button onclick="showConfirmationModal('HC-2026-001')" class="px-3 py-2 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-brand-primary text-xs font-bold transition">
+                  Receipt
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE SETTINGS & ACCOUNT SECTION (Item 16) -->
+      <div class="space-y-4">
+        <h2 class="text-xl font-bold text-brand-dark flex items-center gap-2">
+          <i data-lucide="settings" class="w-5 h-5 text-brand-neutral"></i>
+          <span>Account Settings & Preferences</span>
+        </h2>
+
+        <div class="bg-white border border-brand-border rounded-custom divide-y divide-slate-100 shadow-soft overflow-hidden">
+          
+          <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                <i data-lucide="user" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-brand-dark">Personal Information</h4>
+                <p class="text-[11px] text-brand-neutral">Update your identity, passport records & contact details</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </div>
+
+          <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                <i data-lucide="credit-card" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-brand-dark">Payment Methods</h4>
+                <p class="text-[11px] text-brand-neutral">Manage demonstration cards, UPI IDs and refund preferences</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </div>
+
+          <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                <i data-lucide="bell" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-brand-dark">Notifications & Alerts</h4>
+                <p class="text-[11px] text-brand-neutral">Flight status changes, fare drops, and itinerary updates</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </div>
+
+          <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-brand-dark">Travel Preferences & Dietary</h4>
+                <p class="text-[11px] text-brand-neutral">Vegetarian, Window seats, and accessibility requests</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </div>
+
+          <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center">
+                <i data-lucide="help-circle" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-brand-dark">Help & Support</h4>
+                <p class="text-[11px] text-brand-neutral">Project documentation, FAQs, and prototype walkthrough</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </div>
+
+          <div class="p-4 flex items-center justify-between hover:bg-red-50/50 transition cursor-pointer">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-red-600">Logout</h4>
+                <p class="text-[11px] text-brand-neutral">Sign out of demonstration workspace</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- BOOKING CONFIRMATION MODAL (Item 14) -->
+  <!-- ========================================================================= -->
+  <div id="booking-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-brand-border rounded-[24px] max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Big Check Icon & Header -->
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-brand-secondary mx-auto flex items-center justify-center text-3xl font-extrabold shadow-sm">
+          <i data-lucide="check" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-2xl font-extrabold text-brand-dark tracking-tight">Booking Confirmed!</h3>
+        <p class="text-xs text-brand-neutral">Your reservation has been securely registered in the Horizon Clear network.</p>
+      </div>
+
+      <!-- Booking Card Details -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 text-xs">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-200 font-bold">
+          <span class="text-slate-500 uppercase tracking-wider text-[10px]">Booking Reference</span>
+          <span id="modal-booking-id" class="text-brand-primary text-sm font-mono font-extrabold">HC-2026-001</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-slate-700">
+          <div>
+            <span class="text-[10px] text-brand-neutral block">Destination</span>
+            <span id="modal-dest" class="font-bold text-brand-dark">Goa Beach Escape</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-neutral block">Travel Dates</span>
+            <span class="font-bold text-brand-dark">May 15 – May 18, 2026</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-neutral block">Travellers</span>
+            <span class="font-bold text-brand-dark">2 Adults</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-neutral block">Flight Provider</span>
+            <span class="font-bold text-brand-dark">IndiGo (6E-204)</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-neutral block">Hotel Accommodation</span>
+            <span class="font-bold text-brand-dark">Ocean Pearl Resort</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-brand-neutral block">Meal Plan</span>
+            <span class="font-bold text-brand-dark">Breakfast + Regional Food</span>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
+          <span class="font-bold text-slate-700">Total Demonstration Amount</span>
+          <span id="modal-amount" class="text-base font-extrabold text-brand-secondary">₹30,496</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="space-y-2">
+        <button onclick="closeConfirmationAndGoProfile()" class="w-full py-3 rounded-xl bg-brand-primary hover:bg-brand-primaryHover text-white font-bold text-xs uppercase tracking-wider shadow-md transition flex items-center justify-center gap-2">
+          <i data-lucide="user-round" class="w-4 h-4"></i>
+          <span>View My Trip in Dashboard</span>
+        </button>
+        <button onclick="downloadConfirmationStub()" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-dark font-semibold text-xs transition flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Download Confirmation Stub</span>
+        </button>
+        <button onclick="closeConfirmationModal()" class="w-full py-2 text-center text-xs text-brand-neutral hover:text-brand-dark font-medium transition">
+          Back to Home
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- FOOTER -->
+  <!-- ========================================================================= -->
+  <footer class="bg-white border-t border-brand-border mt-16 pt-10 pb-20 md:pb-10 text-xs text-brand-neutral">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center">
+          <img src="assets/tripzy-logo.png"
+               alt="Tripzy — Gen-Z Travel Club"
+               class="h-12 sm:h-14 w-auto object-contain"
+               title="Tripzy">
+        </div>
+        <p class="text-center md:text-right">
+          College Web Technology Capstone Project • Demonstration Prototype • All Rights Reserved 2026.
+        </p>
+      </div>
+      <div class="border-t border-slate-100 pt-4 flex flex-wrap justify-between items-center gap-2 text-[11px]">
+        <span>Color Palette: Primary #0E7490 | Success #10B981 | Accent #EAB308 | Neutral #64748B</span>
+        <div class="flex gap-4">
+          <span class="hover:underline cursor-pointer">Documentation</span>
+          <span class="hover:underline cursor-pointer">API Specs</span>
+          <span class="hover:underline cursor-pointer">Design System</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- MOBILE BOTTOM NAVIGATION BAR (Required: Fixed bottom navigation) -->
+  <!-- ========================================================================= -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-around shadow-2xl" aria-label="Mobile Navigation">
+    <button onclick="switchView('home')" id="mob-nav-home" class="flex flex-col items-center gap-0.5 text-brand-primary font-bold">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px]">Home</span>
+    </button>
+    <button onclick="switchView('explore')" id="mob-nav-explore" class="flex flex-col items-center gap-0.5 text-brand-neutral hover:text-brand-primary">
+      <i data-lucide="compass" class="w-5 h-5"></i>
+      <span class="text-[10px]">Explore</span>
+    </button>
+    <button onclick="switchView('booking')" id="mob-nav-booking" class="flex flex-col items-center gap-0.5 text-brand-neutral hover:text-brand-primary">
+      <i data-lucide="map" class="w-5 h-5"></i>
+      <span class="text-[10px]">Trips</span>
+    </button>
+    <button onclick="switchView('profile')" id="mob-nav-profile" class="flex flex-col items-center gap-0.5 text-brand-neutral hover:text-brand-primary">
+      <i data-lucide="user-round" class="w-5 h-5"></i>
+      <span class="text-[10px]">Profile</span>
+    </button>
+  </nav>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: DATA INVENTORY, STATE ENGINE & INTERACTIONS -->
+  <!-- ========================================================================= -->
+
+  <script src="js/app.js"></script>
+  <script src="js/images.js"></script>
+</body>
+</html>
